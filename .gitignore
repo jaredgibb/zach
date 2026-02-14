@@ -23,6 +23,7 @@ build/
 
 # Env files
 .env
+.env.local.backup
 .env.local
 .env.*.local
 
