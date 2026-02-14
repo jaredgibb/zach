@@ -17,7 +17,7 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
       }
 
       return (
-            <footer className="bg-gray-900 text-gray-300">
+            <footer className="bg-slate-900 text-slate-300">
                   <div className="container-custom py-12">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                               {/* Left Column - About */}
@@ -32,12 +32,12 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                           <p>{businessInfo.address}</p>
                                           <p>{businessInfo.city}, {businessInfo.state} {businessInfo.zip}</p>
                                           <p>
-                                                <a href={`tel:${businessInfo.phone}`} className="hover:text-primary-400">
+                                                <a href={`tel:${businessInfo.phone}`} className="hover:text-primary-300">
                                                       {businessInfo.phone}
                                                 </a>
                                           </p>
                                           <p>
-                                                <a href={`mailto:${businessInfo.email}`} className="hover:text-primary-400">
+                                                <a href={`mailto:${businessInfo.email}`} className="hover:text-primary-300">
                                                       {businessInfo.email}
                                                 </a>
                                           </p>
@@ -50,15 +50,15 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                     <ul className="space-y-1 text-sm">
                                           {insuranceProviders.map((insurance) => (
                                                 <li key={insurance} className="flex items-start">
-                                                      <span className="text-primary-400 mr-2">•</span>
+                                                      <span className="text-primary-300 mr-2">•</span>
                                                       {insurance}
                                                 </li>
                                           ))}
                                           <li className="flex items-start">
-                                                <span className="text-primary-400 mr-2">•</span>
+                                                <span className="text-primary-300 mr-2">•</span>
                                                 More to come
                                           </li>
-                                          <li className="flex items-start font-medium text-primary-400">
+                                          <li className="flex items-start font-medium text-primary-300">
                                                 <span className="mr-2">•</span>
                                                 Ask if we accept your insurance!
                                           </li>
@@ -70,9 +70,9 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                     <h3 className="text-lg font-semibold text-white mb-4">Get Started</h3>
                                     <Link
                                           href="/contact"
-                                          className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-6 py-3 rounded-lg transition-colors mb-6"
+                                          className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors mb-6"
                                     >
-                                          Contact Us
+                                          Request Appointment
                                     </Link>
 
                                     <div className="mt-8">
@@ -84,7 +84,7 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                                 <p>
                                                       <strong className="text-white">Crisis Line:</strong> Dial or Text 988
                                                 </p>
-                                                <p className="text-xs text-gray-400 mt-3">
+                                                <p className="text-xs text-slate-400 mt-3">
                                                       This is not an emergency service. If you are experiencing a mental health emergency, please use the resources above.
                                                 </p>
                                           </div>
@@ -93,27 +93,27 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                         </div>
 
                         {/* Bottom Links */}
-                        <div className="border-t border-gray-700 mt-8 pt-8">
+                        <div className="border-t border-slate-700 mt-8 pt-8">
                               <div className="flex flex-wrap justify-center gap-6 text-sm">
-                                    <Link href="/privacy-policy" className="hover:text-primary-400">
+                                    <Link href="/privacy-policy" className="hover:text-primary-300">
                                           Privacy Policy
                                     </Link>
-                                    <Link href="/privacy-practices" className="hover:text-primary-400">
+                                    <Link href="/privacy-practices" className="hover:text-primary-300">
                                           Notice of Privacy Practices
                                     </Link>
-                                    <Link href="/no-surprises-act" className="hover:text-primary-400">
+                                    <Link href="/no-surprises-act" className="hover:text-primary-300">
                                           No Surprises Act
                                     </Link>
-                                    <Link href="/nondiscrimination" className="hover:text-primary-400">
+                                    <Link href="/nondiscrimination" className="hover:text-primary-300">
                                           Notice of Nondiscrimination
                                     </Link>
                                     {cmsItems.map((item) => (
-                                          <Link key={item.id} href={item.href} className="hover:text-primary-400">
+                                          <Link key={item.id} href={item.href} className="hover:text-primary-300">
                                                 {item.label}
                                           </Link>
                                     ))}
                               </div>
-                              <div className="text-center text-sm text-gray-500 mt-6">
+                              <div className="text-center text-sm text-slate-500 mt-6">
                                     © {new Date().getFullYear()} Diversified Psychological Services. All rights reserved.
                               </div>
                         </div>

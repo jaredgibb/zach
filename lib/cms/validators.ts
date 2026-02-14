@@ -103,6 +103,60 @@ const heroBlockSchema = z.object({
       }),
 });
 
+const trustBarBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('trust_bar'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            items: z
+                  .array(
+                        z.object({
+                              label: z.string().trim().min(1).max(80),
+                              description: z.string().trim().max(220),
+                        })
+                  )
+                  .min(1)
+                  .max(6),
+      }),
+});
+
+const processStepsBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('process_steps'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            intro: z.string().trim().max(300),
+            steps: z
+                  .array(
+                        z.object({
+                              title: z.string().trim().min(1).max(90),
+                              description: z.string().trim().max(300),
+                        })
+                  )
+                  .min(1)
+                  .max(5),
+      }),
+});
+
+const insuranceStripBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('insurance_strip'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            intro: z.string().trim().max(400),
+            providers: z.array(z.string().trim().min(1).max(80)).min(1).max(24),
+            note: z.string().trim().max(280),
+            ctaLabel: z.string().trim().min(1).max(80),
+            ctaHref: z.string().trim().min(1).max(1024),
+      }).refine((value) => isValidHref(value.ctaHref), {
+            message: 'Insurance strip CTA href must start with /, http://, https://, mailto:, or tel:.',
+            path: ['ctaHref'],
+      }),
+});
+
 const richTextBlockSchema = z.object({
       id: z.string().trim().min(1).max(80),
       type: z.literal('rich_text'),
@@ -307,6 +361,9 @@ const teamGridBlockSchema = z.object({
 
 export const cmsBlockSchema = z.discriminatedUnion('type', [
       heroBlockSchema,
+      trustBarBlockSchema,
+      processStepsBlockSchema,
+      insuranceStripBlockSchema,
       richTextBlockSchema,
       imageTextBlockSchema,
       faqBlockSchema,

@@ -31,7 +31,7 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
       ];
 
       return (
-            <header className="bg-white shadow-md sticky top-0 z-50">
+            <header className="bg-white/95 shadow-md sticky top-0 z-50 backdrop-blur">
                   <nav className="container-custom py-4">
                         <div className="flex justify-between items-center">
                               {/* Logo */}
@@ -43,28 +43,33 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                               </Link>
 
                               {/* Desktop Navigation */}
-                              <div className="hidden md:flex items-center space-x-8">
-                                    {navigation.map((item) => (
-                                          item.external ? (
-                                                <a
-                                                      key={item.name}
-                                                      href={item.href}
-                                                      target="_blank"
-                                                      rel="noopener noreferrer"
-                                                      className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                                                >
-                                                      {item.name}
-                                                </a>
-                                          ) : (
-                                                <Link
-                                                      key={item.name}
-                                                      href={item.href}
-                                                      className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                                                >
-                                                      {item.name}
-                                                </Link>
-                                          )
-                                    ))}
+                              <div className="hidden md:flex items-center gap-8">
+                                    <div className="flex items-center space-x-6">
+                                          {navigation.map((item) => (
+                                                item.external ? (
+                                                      <a
+                                                            key={item.name}
+                                                            href={item.href}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                                      >
+                                                            {item.name}
+                                                      </a>
+                                                ) : (
+                                                      <Link
+                                                            key={item.name}
+                                                            href={item.href}
+                                                            className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                                      >
+                                                            {item.name}
+                                                      </Link>
+                                                )
+                                          ))}
+                                    </div>
+                                    <Link href="/contact" className="btn-primary text-sm px-5 py-2.5">
+                                          Request Appointment
+                                    </Link>
                               </div>
 
                               {/* Mobile menu button */}
@@ -89,6 +94,13 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                         {/* Mobile menu */}
                         {isOpen && (
                               <div className="md:hidden mt-4 pb-3 space-y-1">
+                                    <Link
+                                          href="/contact"
+                                          className="block px-3 py-2.5 rounded-md text-base font-semibold text-white bg-primary-600 hover:bg-primary-700"
+                                          onClick={() => setIsOpen(false)}
+                                    >
+                                          Request Appointment
+                                    </Link>
                                     {navigation.map((item) => (
                                           item.external ? (
                                                 <a

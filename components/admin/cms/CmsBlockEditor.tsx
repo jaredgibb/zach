@@ -32,10 +32,13 @@ import type {
       CmsFaqBlock,
       CmsImageCarouselBlock,
       CmsLinksBlock,
+      CmsInsuranceStripBlock,
       CmsPricingCardsBlock,
+      CmsProcessStepsBlock,
       CmsRichTextBlock,
       CmsTeamGridBlock,
       CmsTestimonialsBlock,
+      CmsTrustBarBlock,
       CmsVideoEmbedBlock,
 } from '@/lib/cms/types';
 
@@ -304,6 +307,378 @@ function HeroFields({
                               />
                         </div>
                   </div>
+            </div>
+      );
+}
+
+function TrustBarFields({
+      block,
+      onChange,
+}: {
+      block: CmsTrustBarBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      const maxItems = 6;
+
+      return (
+            <div className="space-y-4">
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input
+                              type="text"
+                              value={block.data.title}
+                              onChange={(event) =>
+                                    onChange({
+                                          ...block,
+                                          data: { ...block.data, title: event.target.value },
+                                    })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                  </div>
+
+                  <div className="space-y-3">
+                        {block.data.items.map((item, index) => (
+                              <div key={`${block.id}-trust-item-${index}`} className="rounded-lg border border-gray-200 p-3">
+                                    <input
+                                          type="text"
+                                          placeholder="Chip label"
+                                          value={item.label}
+                                          onChange={(event) => {
+                                                const nextItems = [...block.data.items];
+                                                nextItems[index] = {
+                                                      ...nextItems[index],
+                                                      label: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: { ...block.data, items: nextItems },
+                                                });
+                                          }}
+                                          className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+                                    <textarea
+                                          rows={2}
+                                          placeholder="Short supporting description"
+                                          value={item.description}
+                                          onChange={(event) => {
+                                                const nextItems = [...block.data.items];
+                                                nextItems[index] = {
+                                                      ...nextItems[index],
+                                                      description: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: { ...block.data, items: nextItems },
+                                                });
+                                          }}
+                                          className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+                                    <div className="mt-2 text-right">
+                                          <button
+                                                type="button"
+                                                onClick={() => {
+                                                      const nextItems = block.data.items.filter((_, itemIndex) => itemIndex !== index);
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  items:
+                                                                        nextItems.length > 0
+                                                                              ? nextItems
+                                                                              : [{ label: '', description: '' }],
+                                                            },
+                                                      });
+                                                }}
+                                                className="text-sm font-medium text-red-600 hover:underline"
+                                          >
+                                                Remove item
+                                          </button>
+                                    </div>
+                              </div>
+                        ))}
+                  </div>
+
+                  <button
+                        type="button"
+                        disabled={block.data.items.length >= maxItems}
+                        onClick={() =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          items: [...block.data.items, { label: '', description: '' }],
+                                    },
+                              })
+                        }
+                        className="text-sm font-medium text-primary-600 hover:underline disabled:cursor-not-allowed disabled:text-gray-400"
+                  >
+                        + Add trust chip ({block.data.items.length}/{maxItems})
+                  </button>
+            </div>
+      );
+}
+
+function ProcessStepsFields({
+      block,
+      onChange,
+}: {
+      block: CmsProcessStepsBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      const maxSteps = 5;
+
+      return (
+            <div className="space-y-4">
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input
+                              type="text"
+                              value={block.data.title}
+                              onChange={(event) =>
+                                    onChange({
+                                          ...block,
+                                          data: { ...block.data, title: event.target.value },
+                                    })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                  </div>
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Intro</label>
+                        <textarea
+                              rows={2}
+                              value={block.data.intro}
+                              onChange={(event) =>
+                                    onChange({
+                                          ...block,
+                                          data: { ...block.data, intro: event.target.value },
+                                    })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                  </div>
+
+                  <div className="space-y-3">
+                        {block.data.steps.map((step, index) => (
+                              <div key={`${block.id}-process-step-${index}`} className="rounded-lg border border-gray-200 p-3">
+                                    <input
+                                          type="text"
+                                          placeholder={`Step ${index + 1} title`}
+                                          value={step.title}
+                                          onChange={(event) => {
+                                                const nextSteps = [...block.data.steps];
+                                                nextSteps[index] = {
+                                                      ...nextSteps[index],
+                                                      title: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: { ...block.data, steps: nextSteps },
+                                                });
+                                          }}
+                                          className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+                                    <textarea
+                                          rows={2}
+                                          placeholder="Step description"
+                                          value={step.description}
+                                          onChange={(event) => {
+                                                const nextSteps = [...block.data.steps];
+                                                nextSteps[index] = {
+                                                      ...nextSteps[index],
+                                                      description: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: { ...block.data, steps: nextSteps },
+                                                });
+                                          }}
+                                          className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+                                    <div className="mt-2 text-right">
+                                          <button
+                                                type="button"
+                                                onClick={() => {
+                                                      const nextSteps = block.data.steps.filter((_, stepIndex) => stepIndex !== index);
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  steps:
+                                                                        nextSteps.length > 0
+                                                                              ? nextSteps
+                                                                              : [{ title: '', description: '' }],
+                                                            },
+                                                      });
+                                                }}
+                                                className="text-sm font-medium text-red-600 hover:underline"
+                                          >
+                                                Remove step
+                                          </button>
+                                    </div>
+                              </div>
+                        ))}
+                  </div>
+
+                  <button
+                        type="button"
+                        disabled={block.data.steps.length >= maxSteps}
+                        onClick={() =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          steps: [...block.data.steps, { title: '', description: '' }],
+                                    },
+                              })
+                        }
+                        className="text-sm font-medium text-primary-600 hover:underline disabled:cursor-not-allowed disabled:text-gray-400"
+                  >
+                        + Add step ({block.data.steps.length}/{maxSteps})
+                  </button>
+            </div>
+      );
+}
+
+function InsuranceStripFields({
+      block,
+      onChange,
+}: {
+      block: CmsInsuranceStripBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      const maxProviders = 24;
+
+      return (
+            <div className="space-y-4">
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input
+                              type="text"
+                              value={block.data.title}
+                              onChange={(event) =>
+                                    onChange({
+                                          ...block,
+                                          data: { ...block.data, title: event.target.value },
+                                    })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                  </div>
+
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Intro</label>
+                        <textarea
+                              rows={2}
+                              value={block.data.intro}
+                              onChange={(event) =>
+                                    onChange({
+                                          ...block,
+                                          data: { ...block.data, intro: event.target.value },
+                                    })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                  </div>
+
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Supporting Note</label>
+                        <textarea
+                              rows={2}
+                              value={block.data.note}
+                              onChange={(event) =>
+                                    onChange({
+                                          ...block,
+                                          data: { ...block.data, note: event.target.value },
+                                    })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">CTA Label</label>
+                              <input
+                                    type="text"
+                                    value={block.data.ctaLabel}
+                                    onChange={(event) =>
+                                          onChange({
+                                                ...block,
+                                                data: { ...block.data, ctaLabel: event.target.value },
+                                          })
+                                    }
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                              />
+                        </div>
+                        <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">CTA Href</label>
+                              <input
+                                    type="text"
+                                    list={CMS_LINK_SUGGESTIONS_DATALIST_ID}
+                                    value={block.data.ctaHref}
+                                    onChange={(event) =>
+                                          onChange({
+                                                ...block,
+                                                data: { ...block.data, ctaHref: event.target.value },
+                                          })
+                                    }
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                              />
+                        </div>
+                  </div>
+
+                  <div className="space-y-3">
+                        {block.data.providers.map((provider, index) => (
+                              <div key={`${block.id}-provider-${index}`} className="flex gap-3">
+                                    <input
+                                          type="text"
+                                          value={provider}
+                                          onChange={(event) => {
+                                                const nextProviders = [...block.data.providers];
+                                                nextProviders[index] = event.target.value;
+                                                onChange({
+                                                      ...block,
+                                                      data: { ...block.data, providers: nextProviders },
+                                                });
+                                          }}
+                                          placeholder="Insurance provider"
+                                          className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+                                    <button
+                                          type="button"
+                                          onClick={() => {
+                                                const nextProviders = block.data.providers.filter((_, providerIndex) => providerIndex !== index);
+                                                onChange({
+                                                      ...block,
+                                                      data: {
+                                                            ...block.data,
+                                                            providers: nextProviders.length > 0 ? nextProviders : [''],
+                                                      },
+                                                });
+                                          }}
+                                          className="text-sm font-medium text-red-600 hover:underline"
+                                    >
+                                          Remove
+                                    </button>
+                              </div>
+                        ))}
+                  </div>
+
+                  <button
+                        type="button"
+                        disabled={block.data.providers.length >= maxProviders}
+                        onClick={() =>
+                              onChange({
+                                    ...block,
+                                    data: { ...block.data, providers: [...block.data.providers, ''] },
+                              })
+                        }
+                        className="text-sm font-medium text-primary-600 hover:underline disabled:cursor-not-allowed disabled:text-gray-400"
+                  >
+                        + Add provider ({block.data.providers.length}/{maxProviders})
+                  </button>
             </div>
       );
 }
@@ -1864,6 +2239,12 @@ function BlockFields({
       switch (block.type) {
             case 'hero':
                   return <HeroFields block={block} onChange={onChange} />;
+            case 'trust_bar':
+                  return <TrustBarFields block={block} onChange={onChange} />;
+            case 'process_steps':
+                  return <ProcessStepsFields block={block} onChange={onChange} />;
+            case 'insurance_strip':
+                  return <InsuranceStripFields block={block} onChange={onChange} />;
             case 'rich_text':
                   return <RichTextFields block={block} onChange={onChange} />;
             case 'image_text':
@@ -1947,6 +2328,15 @@ export default function CmsBlockEditor({
                         <div className="flex flex-wrap gap-2">
                               <button type="button" onClick={() => addBlock('hero')} className="btn-secondary text-sm px-4 py-2">
                                     Hero
+                              </button>
+                              <button type="button" onClick={() => addBlock('trust_bar')} className="btn-secondary text-sm px-4 py-2">
+                                    Trust Bar
+                              </button>
+                              <button type="button" onClick={() => addBlock('process_steps')} className="btn-secondary text-sm px-4 py-2">
+                                    Process Steps
+                              </button>
+                              <button type="button" onClick={() => addBlock('insurance_strip')} className="btn-secondary text-sm px-4 py-2">
+                                    Insurance Strip
                               </button>
                               <button type="button" onClick={() => addBlock('rich_text')} className="btn-secondary text-sm px-4 py-2">
                                     Rich Text

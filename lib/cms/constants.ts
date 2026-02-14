@@ -2,6 +2,12 @@ export const CMS_COLLECTION = 'pages';
 
 export const SYSTEM_PAGE_DEFINITIONS = [
       {
+            key: 'home',
+            slug: 'home',
+            path: '/',
+            title: 'Home',
+      },
+      {
             key: 'privacy-policy',
             slug: 'privacy-policy',
             path: '/privacy-policy',
@@ -37,6 +43,7 @@ const STATIC_RESERVED = [
       'contact',
       'services',
       'therapists',
+      'home',
       'privacy-policy',
       'privacy-practices',
       'no-surprises-act',
@@ -54,6 +61,9 @@ export const RESERVED_SLUGS = new Set<string>([
 
 export const CMS_BLOCK_TYPES = [
       'hero',
+      'trust_bar',
+      'process_steps',
+      'insurance_strip',
       'rich_text',
       'image_text',
       'faq',

@@ -86,7 +86,209 @@ function createSnapshot({ title, path, metaDescription, content }) {
       };
 }
 
+function createHomeSnapshot({ title, path, metaDescription }) {
+      return {
+            title,
+            blocks: [
+                  {
+                        id: randomUUID(),
+                        type: 'hero',
+                        visible: true,
+                        data: {
+                              headline: 'Therapy that meets you where you are',
+                              subheadline: 'Compassionate, evidence-informed care with in-person and secure telehealth options. We accept many major insurance plans and make getting started straightforward.',
+                              alignment: 'left',
+                              theme: 'primary',
+                              ctaPrimary: {
+                                    label: 'Request Appointment',
+                                    href: '/contact',
+                              },
+                              ctaSecondary: {
+                                    label: 'Explore Services',
+                                    href: '/services',
+                              },
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'trust_bar',
+                        visible: true,
+                        data: {
+                              title: 'Access-focused care for real life',
+                              items: [
+                                    {
+                                          label: 'Insurance accepted',
+                                          description: 'Most major plans accepted with support during intake.',
+                                    },
+                                    {
+                                          label: 'Flexible formats',
+                                          description: 'In-person visits and secure telehealth appointments.',
+                                    },
+                                    {
+                                          label: 'Licensed clinicians',
+                                          description: 'Experienced therapists delivering evidence-informed care.',
+                                    },
+                              ],
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'image_text',
+                        visible: true,
+                        data: {
+                              headline: 'Support for what you are carrying right now',
+                              body: 'Whether you are navigating anxiety, relationship stress, grief, or life transitions, therapy can provide practical tools and steady guidance. We tailor treatment plans to your goals and pace.',
+                              imageUrl: '',
+                              imageAlt: '',
+                              imageSide: 'right',
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'process_steps',
+                        visible: true,
+                        data: {
+                              title: 'A clear path from first contact to steady progress',
+                              intro: 'We keep intake simple and collaborative from day one.',
+                              steps: [
+                                    {
+                                          title: 'Request an appointment',
+                                          description: 'Share your availability, insurance, and any therapist preferences.',
+                                    },
+                                    {
+                                          title: 'Get matched',
+                                          description: 'We connect you with a therapist who aligns with your goals.',
+                                    },
+                                    {
+                                          title: 'Begin care',
+                                          description: 'Start one-on-one sessions and build momentum over time.',
+                                    },
+                              ],
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'team_grid',
+                        visible: true,
+                        data: {
+                              title: 'Meet our therapists',
+                              intro: 'A multidisciplinary team committed to thoughtful, effective care.',
+                              columns: 3,
+                              members: [
+                                    {
+                                          name: 'Erin Alexander-Bell',
+                                          role: 'MA, LPC',
+                                          bio: 'Individual and family therapy with a compassionate, client-centered approach.',
+                                          imageUrl: '',
+                                          imageAlt: '',
+                                          profileHref: '/therapists',
+                                    },
+                                    {
+                                          name: 'Zach Dugger',
+                                          role: 'MA, BCBA, LLP',
+                                          bio: 'Behavioral psychology and evidence-based therapeutic interventions.',
+                                          imageUrl: '',
+                                          imageAlt: '',
+                                          profileHref: '/therapists',
+                                    },
+                                    {
+                                          name: 'Ian Warnsley',
+                                          role: 'MA, LPC',
+                                          bio: 'Compassionate therapy for individuals and couples.',
+                                          imageUrl: '',
+                                          imageAlt: '',
+                                          profileHref: '/therapists',
+                                    },
+                              ],
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'insurance_strip',
+                        visible: true,
+                        data: {
+                              title: 'Insurance and scheduling',
+                              intro: 'We offer practical scheduling support and accept many major plans.',
+                              providers: [
+                                    'Blue Cross Blue Shield',
+                                    'Blue Care Network',
+                                    'Priority Health',
+                                    'United Healthcare / UBH',
+                                    'Aetna',
+                                    'Michigan Medicaid',
+                                    'Medicare',
+                              ],
+                              note: 'Have another plan? Contact us and we will confirm whether we can bill it.',
+                              ctaLabel: 'Request Appointment',
+                              ctaHref: '/contact',
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'faq',
+                        visible: true,
+                        data: {
+                              title: 'Frequently asked questions',
+                              enableSchema: true,
+                              items: [
+                                    {
+                                          question: 'Do you offer telehealth sessions?',
+                                          answer: 'Yes. We offer secure telehealth sessions in addition to in-person appointments.',
+                                    },
+                                    {
+                                          question: 'How quickly will someone respond?',
+                                          answer: 'We aim to respond to new appointment requests within 1-2 business days.',
+                                    },
+                                    {
+                                          question: 'Can this practice help in a crisis?',
+                                          answer: 'This practice is not an emergency service. If you are in immediate danger, call 911. For mental health crisis support, call or text 988.',
+                                    },
+                              ],
+                        },
+                  },
+                  {
+                        id: randomUUID(),
+                        type: 'cta_band',
+                        visible: true,
+                        data: {
+                              heading: 'Ready to take the next step?',
+                              body: 'Request an appointment and our team will help you get started.',
+                              buttonLabel: 'Request Appointment',
+                              buttonHref: '/contact',
+                              style: 'primary',
+                        },
+                  },
+            ],
+            seo: {
+                  metaTitle: title,
+                  metaDescription,
+                  canonicalPath: path,
+                  ogTitle: title,
+                  ogDescription: metaDescription,
+                  ogImageUrl: '',
+                  noIndex: false,
+                  noFollow: false,
+                  schemaJson: '',
+            },
+            nav: {
+                  showInHeader: false,
+                  headerLabel: '',
+                  headerOrder: 100,
+                  showInFooter: false,
+                  footerLabel: '',
+                  footerOrder: 100,
+            },
+      };
+}
+
 const systemPages = [
+      {
+            slug: 'home',
+            path: '/',
+            title: 'Diversified Psychological Services | Therapy in Kalamazoo, MI',
+            metaDescription: 'Compassionate and evidence-informed therapy in Kalamazoo, MI with in-person and secure telehealth options. Request an appointment with Diversified Psychological Services.',
+            content: '',
+      },
       {
             slug: 'privacy-policy',
             path: '/privacy-policy',
@@ -153,7 +355,9 @@ async function run() {
                   .limit(1)
                   .get();
 
-            const snapshot = createSnapshot(definition);
+            const snapshot = definition.slug === 'home'
+                  ? createHomeSnapshot(definition)
+                  : createSnapshot(definition);
 
             if (querySnapshot.empty) {
                   report.push(`create ${definition.slug}`);
@@ -206,7 +410,7 @@ async function run() {
             }
       }
 
-      console.log('System legal page seed report');
+      console.log('System page seed report');
       for (const line of report) {
             console.log(`- ${line}`);
       }

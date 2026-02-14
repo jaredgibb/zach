@@ -3,16 +3,19 @@ import type {
       CmsCtaBandBlock,
       CmsFaqBlock,
       CmsHeroBlock,
+      CmsInsuranceStripBlock,
       CmsImageCarouselBlock,
       CmsImageTextBlock,
       CmsLinksBlock,
       CmsPageNav,
       CmsPageSeo,
+      CmsProcessStepsBlock,
       CmsPageSnapshot,
       CmsPricingCardsBlock,
       CmsRichTextBlock,
       CmsTeamGridBlock,
       CmsTestimonialsBlock,
+      CmsTrustBarBlock,
       CmsVideoEmbedBlock,
 } from '@/lib/cms/types';
 
@@ -58,6 +61,78 @@ export function createDefaultHeroBlock(id: string): CmsHeroBlock {
                   theme: 'primary',
                   ctaPrimary: null,
                   ctaSecondary: null,
+            },
+      };
+}
+
+export function createDefaultTrustBarBlock(id: string): CmsTrustBarBlock {
+      return {
+            id,
+            type: 'trust_bar',
+            visible: true,
+            data: {
+                  title: 'Why Clients Choose Diversified Psychological Services',
+                  items: [
+                        {
+                              label: 'Insurance accepted',
+                              description: 'Most major plans accepted with straightforward intake support.',
+                        },
+                        {
+                              label: 'Flexible care formats',
+                              description: 'In-person and secure telehealth appointments across Michigan.',
+                        },
+                        {
+                              label: 'Licensed clinicians',
+                              description: 'Evidence-informed care from experienced, credentialed therapists.',
+                        },
+                  ],
+            },
+      };
+}
+
+export function createDefaultProcessStepsBlock(id: string): CmsProcessStepsBlock {
+      return {
+            id,
+            type: 'process_steps',
+            visible: true,
+            data: {
+                  title: 'How to Get Started',
+                  intro: 'A simple path from first call to steady progress.',
+                  steps: [
+                        {
+                              title: '1. Request an appointment',
+                              description: 'Share your availability, insurance, and preferences.',
+                        },
+                        {
+                              title: '2. Get matched',
+                              description: 'We connect you with the right therapist for your goals.',
+                        },
+                        {
+                              title: '3. Begin care',
+                              description: 'Start one-on-one sessions and build momentum over time.',
+                        },
+                  ],
+            },
+      };
+}
+
+export function createDefaultInsuranceStripBlock(id: string): CmsInsuranceStripBlock {
+      return {
+            id,
+            type: 'insurance_strip',
+            visible: true,
+            data: {
+                  title: 'Insurance and Scheduling',
+                  intro: 'We accept many major insurance plans and respond quickly to new appointment requests.',
+                  providers: [
+                        'Blue Cross Blue Shield',
+                        'Blue Care Network',
+                        'Priority Health',
+                        'United Healthcare / UBH',
+                  ],
+                  note: 'Not sure if your plan is accepted? Contact us and we will confirm coverage options.',
+                  ctaLabel: 'Request Appointment',
+                  ctaHref: '/contact',
             },
       };
 }
@@ -251,6 +326,12 @@ export function createDefaultBlock(type: CmsBlock['type'], id: string): CmsBlock
       switch (type) {
             case 'hero':
                   return createDefaultHeroBlock(id);
+            case 'trust_bar':
+                  return createDefaultTrustBarBlock(id);
+            case 'process_steps':
+                  return createDefaultProcessStepsBlock(id);
+            case 'insurance_strip':
+                  return createDefaultInsuranceStripBlock(id);
             case 'rich_text':
                   return createDefaultRichTextBlock(id);
             case 'image_text':

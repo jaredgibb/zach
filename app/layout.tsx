@@ -1,12 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Lora, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ClientPortalBanner from "@/components/ClientPortalBanner";
 import { getPublishedNavItems } from "@/lib/cms/server";
 
-const inter = Inter({ subsets: ["latin"] });
+const sourceSans = Source_Sans_3({
+      subsets: ["latin"],
+      variable: "--font-body",
+      weight: ["400", "500", "600", "700"],
+});
+
+const lora = Lora({
+      subsets: ["latin"],
+      variable: "--font-display",
+      weight: ["500", "600", "700"],
+});
 const fallbackMetadataBase = "http://localhost:3000";
 
 function getMetadataBase(): URL {
@@ -37,11 +47,13 @@ export default async function RootLayout({
 
       return (
             <html lang="en">
-                  <body className={inter.className}>
-                        <ClientPortalBanner />
-                        <Header cmsItems={headerItems} />
-                        <main className="min-h-screen">{children}</main>
-                        <Footer cmsItems={footerItems} />
+                  <body className={`${sourceSans.className} ${sourceSans.variable} ${lora.variable}`}>
+                        <div className="public-site-shell">
+                              <ClientPortalBanner />
+                              <Header cmsItems={headerItems} />
+                              <main className="min-h-screen">{children}</main>
+                              <Footer cmsItems={footerItems} />
+                        </div>
                   </body>
             </html>
       );

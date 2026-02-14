@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { CMS_COLLECTION } from '@/lib/cms/constants';
+import { CMS_COLLECTION, SYSTEM_PAGE_DEFINITIONS } from '@/lib/cms/constants';
 import { createDefaultSnapshot } from '@/lib/cms/defaults';
 import type {
       CmsFaqBlock,
@@ -147,6 +147,16 @@ export async function getPublishedSystemPageBySlug(slug: string): Promise<CmsPag
       }
 
       return page;
+}
+
+const HOME_SYSTEM_SLUG = SYSTEM_PAGE_DEFINITIONS.find((page) => page.key === 'home')?.slug ?? 'home';
+
+export async function getPublishedHomePage(): Promise<CmsPage | null> {
+      try {
+            return await getPublishedSystemPageBySlug(HOME_SYSTEM_SLUG);
+      } catch {
+            return null;
+      }
 }
 
 export async function getPublishedNavItems(): Promise<{

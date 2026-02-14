@@ -4,6 +4,9 @@ export type CmsPageStatus = 'draft' | 'published' | 'unpublished';
 
 export type CmsBlockType =
       | 'hero'
+      | 'trust_bar'
+      | 'process_steps'
+      | 'insurance_strip'
       | 'rich_text'
       | 'image_text'
       | 'faq'
@@ -27,6 +30,36 @@ export interface CmsHeroBlockData {
       theme: 'primary' | 'light' | 'dark';
       ctaPrimary: CmsCtaLink | null;
       ctaSecondary: CmsCtaLink | null;
+}
+
+export interface CmsTrustBarItem {
+      label: string;
+      description: string;
+}
+
+export interface CmsTrustBarBlockData {
+      title: string;
+      items: CmsTrustBarItem[];
+}
+
+export interface CmsProcessStep {
+      title: string;
+      description: string;
+}
+
+export interface CmsProcessStepsBlockData {
+      title: string;
+      intro: string;
+      steps: CmsProcessStep[];
+}
+
+export interface CmsInsuranceStripBlockData {
+      title: string;
+      intro: string;
+      providers: string[];
+      note: string;
+      ctaLabel: string;
+      ctaHref: string;
 }
 
 export interface CmsRichTextBlockData {
@@ -153,6 +186,12 @@ interface CmsBaseBlock<TType extends CmsBlockType, TData> {
 
 export type CmsHeroBlock = CmsBaseBlock<'hero', CmsHeroBlockData>;
 
+export type CmsTrustBarBlock = CmsBaseBlock<'trust_bar', CmsTrustBarBlockData>;
+
+export type CmsProcessStepsBlock = CmsBaseBlock<'process_steps', CmsProcessStepsBlockData>;
+
+export type CmsInsuranceStripBlock = CmsBaseBlock<'insurance_strip', CmsInsuranceStripBlockData>;
+
 export type CmsRichTextBlock = CmsBaseBlock<'rich_text', CmsRichTextBlockData>;
 
 export type CmsImageTextBlock = CmsBaseBlock<'image_text', CmsImageTextBlockData>;
@@ -175,6 +214,9 @@ export type CmsTeamGridBlock = CmsBaseBlock<'team_grid', CmsTeamGridBlockData>;
 
 export type CmsBlock =
       | CmsHeroBlock
+      | CmsTrustBarBlock
+      | CmsProcessStepsBlock
+      | CmsInsuranceStripBlock
       | CmsRichTextBlock
       | CmsImageTextBlock
       | CmsFaqBlock
