@@ -3,8 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { businessInfo, insuranceProviders } from '@/lib/data';
+import type { CmsFooterNavItem } from '@/lib/cms/types';
 
-export default function Footer() {
+interface FooterProps {
+      cmsItems?: CmsFooterNavItem[];
+}
+
+export default function Footer({ cmsItems = [] }: FooterProps) {
       const pathname = usePathname();
 
       if (pathname === '/admin' || pathname.startsWith('/admin/')) {
@@ -102,6 +107,11 @@ export default function Footer() {
                                     <Link href="/nondiscrimination" className="hover:text-primary-400">
                                           Notice of Nondiscrimination
                                     </Link>
+                                    {cmsItems.map((item) => (
+                                          <Link key={item.id} href={item.href} className="hover:text-primary-400">
+                                                {item.label}
+                                          </Link>
+                                    ))}
                               </div>
                               <div className="text-center text-sm text-gray-500 mt-6">
                                     © {new Date().getFullYear()} Diversified Psychological Services. All rights reserved.

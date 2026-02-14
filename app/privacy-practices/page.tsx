@@ -1,4 +1,52 @@
-export default function PrivacyPracticesPage() {
+import type { Metadata } from 'next';
+import CmsPageRenderer from '@/components/cms/CmsPageRenderer';
+import { buildJsonLdSchemas, buildSiteUrl, getPublishedSystemPageBySlug, getPublicSnapshot } from '@/lib/cms/server';
+
+const SYSTEM_SLUG = 'privacy-practices';
+const FALLBACK_TITLE = 'Notice of Privacy Practices';
+const FALLBACK_DESCRIPTION = 'HIPAA notice of privacy practices and patient rights information.';
+
+export async function generateMetadata(): Promise<Metadata> {
+      const page = await getPublishedSystemPageBySlug(SYSTEM_SLUG);
+
+      if (!page || !page.published) {
+            return {
+                  title: FALLBACK_TITLE,
+                  description: FALLBACK_DESCRIPTION,
+            };
+      }
+
+      const snapshot = getPublicSnapshot(page);
+      const title = snapshot.seo.metaTitle || snapshot.title;
+      const description = snapshot.seo.metaDescription || FALLBACK_DESCRIPTION;
+      const canonicalUrl = buildSiteUrl(snapshot.seo.canonicalPath || page.path);
+
+      return {
+            title,
+            description,
+            alternates: {
+                  canonical: canonicalUrl,
+            },
+            robots: {
+                  index: !snapshot.seo.noIndex,
+                  follow: !snapshot.seo.noFollow,
+            },
+            openGraph: {
+                  title: snapshot.seo.ogTitle || title,
+                  description: snapshot.seo.ogDescription || description,
+                  url: canonicalUrl,
+                  images: snapshot.seo.ogImageUrl ? [{ url: snapshot.seo.ogImageUrl }] : undefined,
+            },
+      };
+}
+
+export default async function PrivacyPracticesPage() {
+      const page = await getPublishedSystemPageBySlug(SYSTEM_SLUG);
+
+      if (page && page.published) {
+            return <CmsPageRenderer page={page} includeSchemas jsonLdSchemas={buildJsonLdSchemas(page)} />;
+      }
+
       return (
             <div className="py-16">
                   <div className="container-custom">

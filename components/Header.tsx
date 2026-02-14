@@ -4,8 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { businessInfo } from '@/lib/data';
+import type { CmsHeaderNavItem } from '@/lib/cms/types';
 
-export default function Header() {
+interface HeaderProps {
+      cmsItems?: CmsHeaderNavItem[];
+}
+
+export default function Header({ cmsItems = [] }: HeaderProps) {
       const [isOpen, setIsOpen] = useState(false);
       const pathname = usePathname();
 
@@ -18,6 +23,10 @@ export default function Header() {
             { name: 'Our Therapists', href: '/therapists' },
             { name: 'Services', href: '/services' },
             { name: 'Contact Us', href: '/contact' },
+            ...cmsItems.map((item) => ({
+                  name: item.label,
+                  href: item.href,
+            })),
             { name: 'Client Portal', href: businessInfo.clientPortalUrl, external: true },
       ];
 
