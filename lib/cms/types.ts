@@ -2,7 +2,14 @@ export type CmsPageKind = 'system' | 'custom';
 
 export type CmsPageStatus = 'draft' | 'published' | 'unpublished';
 
-export type CmsBlockType = 'hero' | 'rich_text' | 'image_text' | 'faq' | 'cta_band';
+export type CmsBlockType =
+      | 'hero'
+      | 'rich_text'
+      | 'image_text'
+      | 'faq'
+      | 'cta_band'
+      | 'cms_links'
+      | 'image_carousel';
 
 export interface CmsCtaLink {
       label: string;
@@ -51,6 +58,33 @@ export interface CmsCtaBandBlockData {
       style: 'primary' | 'light' | 'dark';
 }
 
+export interface CmsLinksItem {
+      label: string;
+      href: string;
+      description: string;
+}
+
+export interface CmsLinksBlockData {
+      title: string;
+      intro: string;
+      layout: 'list' | 'grid';
+      items: CmsLinksItem[];
+}
+
+export interface CmsCarouselItem {
+      imageUrl: string;
+      imageAlt: string;
+      caption: string;
+      href: string;
+}
+
+export interface CmsImageCarouselBlockData {
+      title: string;
+      autoplay: boolean;
+      intervalMs: number;
+      items: CmsCarouselItem[];
+}
+
 interface CmsBaseBlock<TType extends CmsBlockType, TData> {
       id: string;
       type: TType;
@@ -68,12 +102,18 @@ export type CmsFaqBlock = CmsBaseBlock<'faq', CmsFaqBlockData>;
 
 export type CmsCtaBandBlock = CmsBaseBlock<'cta_band', CmsCtaBandBlockData>;
 
+export type CmsLinksBlock = CmsBaseBlock<'cms_links', CmsLinksBlockData>;
+
+export type CmsImageCarouselBlock = CmsBaseBlock<'image_carousel', CmsImageCarouselBlockData>;
+
 export type CmsBlock =
       | CmsHeroBlock
       | CmsRichTextBlock
       | CmsImageTextBlock
       | CmsFaqBlock
-      | CmsCtaBandBlock;
+      | CmsCtaBandBlock
+      | CmsLinksBlock
+      | CmsImageCarouselBlock;
 
 export interface CmsPageSeo {
       metaTitle: string;

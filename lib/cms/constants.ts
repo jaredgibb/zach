@@ -58,4 +58,6 @@ export const CMS_BLOCK_TYPES = [
       'image_text',
       'faq',
       'cta_band',
+      'cms_links',
+      'image_carousel',
 ] as const;

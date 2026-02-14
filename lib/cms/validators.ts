@@ -154,12 +154,65 @@ const ctaBandBlockSchema = z.object({
       }),
 });
 
+const cmsLinksBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('cms_links'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            intro: z.string().trim().max(1000),
+            layout: z.enum(['list', 'grid']),
+            items: z
+                  .array(
+                        z
+                              .object({
+                                    label: z.string().trim().min(1).max(120),
+                                    href: z.string().trim().min(1).max(1024),
+                                    description: z.string().trim().max(300),
+                              })
+                              .refine((item) => isValidHref(item.href), {
+                                    message: 'Link href must start with /, http://, https://, mailto:, or tel:.',
+                                    path: ['href'],
+                              })
+                  )
+                  .max(30),
+      }),
+});
+
+const imageCarouselBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('image_carousel'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            autoplay: z.boolean(),
+            intervalMs: z.coerce.number().int().min(1000).max(30000),
+            items: z
+                  .array(
+                        z
+                              .object({
+                                    imageUrl: z.string().trim().min(1).max(2048),
+                                    imageAlt: z.string().trim().max(300),
+                                    caption: z.string().trim().max(300),
+                                    href: z.string().trim().max(1024),
+                              })
+                              .refine((item) => !item.href || isValidHref(item.href), {
+                                    message: 'Slide link must start with /, http://, https://, mailto:, or tel:.',
+                                    path: ['href'],
+                              })
+                  )
+                  .max(20),
+      }),
+});
+
 export const cmsBlockSchema = z.discriminatedUnion('type', [
       heroBlockSchema,
       richTextBlockSchema,
       imageTextBlockSchema,
       faqBlockSchema,
       ctaBandBlockSchema,
+      cmsLinksBlockSchema,
+      imageCarouselBlockSchema,
 ]);
 
 export const cmsSeoSchema = z

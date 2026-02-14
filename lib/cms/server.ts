@@ -12,7 +12,11 @@ import type {
       CmsPageStatus,
 } from '@/lib/cms/types';
 import { cmsPageSnapshotSchema, parseOptionalSchemaJson } from '@/lib/cms/validators';
-import { adminDb } from '@/lib/firebase/admin';
+
+async function getAdminDb() {
+      const { adminDb } = await import('@/lib/firebase/admin');
+      return adminDb;
+}
 
 function toIsoString(value: unknown): string {
       if (typeof value === 'string') {
@@ -87,12 +91,18 @@ function mapPageDocument(snapshot: FirebaseFirestore.QueryDocumentSnapshot | Fir
 }
 
 export async function getCmsPageById(pageId: string): Promise<CmsPage | null> {
-      const snapshot = await adminDb.collection(CMS_COLLECTION).doc(pageId).get();
-      return mapPageDocument(snapshot);
+      try {
+            const db = await getAdminDb();
+            const snapshot = await db.collection(CMS_COLLECTION).doc(pageId).get();
+            return mapPageDocument(snapshot);
+      } catch {
+            return null;
+      }
 }
 
 export async function listCmsPages(): Promise<CmsPageListItem[]> {
-      const snapshot = await adminDb.collection(CMS_COLLECTION).get();
+      const db = await getAdminDb();
+      const snapshot = await db.collection(CMS_COLLECTION).get();
 
       return snapshot.docs
             .map((docSnapshot) => mapPageDocument(docSnapshot))
@@ -111,11 +121,8 @@ export async function listCmsPages(): Promise<CmsPageListItem[]> {
 }
 
 export async function getCmsPageBySlug(slug: string): Promise<CmsPage | null> {
-      const snapshot = await adminDb
-            .collection(CMS_COLLECTION)
-            .where('slug', '==', slug)
-            .limit(1)
-            .get();
+      const db = await getAdminDb();
+      const snapshot = await db.collection(CMS_COLLECTION).where('slug', '==', slug).limit(1).get();
 
       if (snapshot.empty) {
             return null;
@@ -146,10 +153,16 @@ export async function getPublishedNavItems(): Promise<{
       headerItems: CmsHeaderNavItem[];
       footerItems: CmsFooterNavItem[];
 }> {
-      const snapshot = await adminDb
-            .collection(CMS_COLLECTION)
-            .where('status', '==', 'published')
-            .get();
+      let snapshot: FirebaseFirestore.QuerySnapshot;
+      try {
+            const db = await getAdminDb();
+            snapshot = await db.collection(CMS_COLLECTION).where('status', '==', 'published').get();
+      } catch {
+            return {
+                  headerItems: [],
+                  footerItems: [],
+            };
+      }
 
       const pages = snapshot.docs
             .map((docSnapshot) => mapPageDocument(docSnapshot))
@@ -196,18 +209,20 @@ export async function getPublishedNavItems(): Promise<{
 }
 
 export async function getSitemapPages(): Promise<Array<{ path: string; updatedAt: string }>> {
-      const snapshot = await adminDb
-            .collection(CMS_COLLECTION)
-            .where('status', '==', 'published')
-            .get();
+      try {
+            const db = await getAdminDb();
+            const snapshot = await db.collection(CMS_COLLECTION).where('status', '==', 'published').get();
 
-      return snapshot.docs
-            .map((docSnapshot) => mapPageDocument(docSnapshot))
-            .filter((page): page is CmsPage => Boolean(page) && page?.status === 'published')
-            .map((page) => ({
-                  path: page.path,
-                  updatedAt: page.updatedAt || page.publishedAt || new Date(0).toISOString(),
-            }));
+            return snapshot.docs
+                  .map((docSnapshot) => mapPageDocument(docSnapshot))
+                  .filter((page): page is CmsPage => Boolean(page) && page?.status === 'published')
+                  .map((page) => ({
+                        path: page.path,
+                        updatedAt: page.updatedAt || page.publishedAt || new Date(0).toISOString(),
+                  }));
+      } catch {
+            return [];
+      }
 }
 
 export function getPublicSnapshot(page: CmsPage): CmsPageSnapshot {
@@ -258,7 +273,7 @@ export function buildJsonLdSchemas(page: CmsPage): Array<Record<string, unknown>
                         mainEntity: entities,
                   };
             })
-            .filter((item): item is Record<string, unknown> => Boolean(item));
+            .filter((item) => Boolean(item)) as Array<Record<string, unknown>>;
 
       return [...schemas, ...faqSchemas];
 }

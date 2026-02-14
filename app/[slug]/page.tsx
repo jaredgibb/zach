@@ -28,6 +28,17 @@ function getFallbackDescription(blocks: CmsBlock[]): string {
             if (block.type === 'hero' && block.data.subheadline.trim()) {
                   return block.data.subheadline.slice(0, 155);
             }
+
+            if (block.type === 'cms_links' && block.data.intro.trim()) {
+                  return block.data.intro.slice(0, 155);
+            }
+
+            if (block.type === 'image_carousel') {
+                  const firstCaption = block.data.items.find((item) => item.caption.trim())?.caption ?? '';
+                  if (firstCaption) {
+                        return firstCaption.slice(0, 155);
+                  }
+            }
       }
 
       return '';

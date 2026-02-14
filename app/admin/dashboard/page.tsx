@@ -110,6 +110,25 @@ export default function AdminDashboard() {
                                           </Link>
                                     </div>
                               </div>
+
+                              {/* Pages Card */}
+                              <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow md:col-span-2">
+                                    <div className="bg-primary-600 text-white p-6">
+                                          <h2 className="text-2xl font-bold mb-2">Page Builder</h2>
+                                          <p className="text-primary-100">Create, edit, preview, and publish SEO-ready pages</p>
+                                    </div>
+                                    <div className="p-6">
+                                          <p className="text-gray-600 mb-6">
+                                                Manage custom pages and legal pages with block-based editing, draft workflow, and SEO controls.
+                                          </p>
+                                          <Link
+                                                href="/admin/pages"
+                                                className="inline-block btn-primary"
+                                          >
+                                                Open Page Builder
+                                          </Link>
+                                    </div>
+                              </div>
                         </div>
 
                         {/* Quick Stats */}

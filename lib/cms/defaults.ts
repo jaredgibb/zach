@@ -3,7 +3,9 @@ import type {
       CmsCtaBandBlock,
       CmsFaqBlock,
       CmsHeroBlock,
+      CmsImageCarouselBlock,
       CmsImageTextBlock,
+      CmsLinksBlock,
       CmsPageNav,
       CmsPageSeo,
       CmsPageSnapshot,
@@ -117,6 +119,47 @@ export function createDefaultCtaBandBlock(id: string): CmsCtaBandBlock {
       };
 }
 
+export function createDefaultCmsLinksBlock(id: string): CmsLinksBlock {
+      return {
+            id,
+            type: 'cms_links',
+            visible: true,
+            data: {
+                  title: 'Related Pages',
+                  intro: '',
+                  layout: 'grid',
+                  items: [
+                        {
+                              label: '',
+                              href: '',
+                              description: '',
+                        },
+                  ],
+            },
+      };
+}
+
+export function createDefaultImageCarouselBlock(id: string): CmsImageCarouselBlock {
+      return {
+            id,
+            type: 'image_carousel',
+            visible: true,
+            data: {
+                  title: 'Image Carousel',
+                  autoplay: false,
+                  intervalMs: 5000,
+                  items: [
+                        {
+                              imageUrl: '',
+                              imageAlt: '',
+                              caption: '',
+                              href: '',
+                        },
+                  ],
+            },
+      };
+}
+
 export function createDefaultBlock(type: CmsBlock['type'], id: string): CmsBlock {
       switch (type) {
             case 'hero':
@@ -129,6 +172,10 @@ export function createDefaultBlock(type: CmsBlock['type'], id: string): CmsBlock
                   return createDefaultFaqBlock(id);
             case 'cta_band':
                   return createDefaultCtaBandBlock(id);
+            case 'cms_links':
+                  return createDefaultCmsLinksBlock(id);
+            case 'image_carousel':
+                  return createDefaultImageCarouselBlock(id);
             default:
                   return createDefaultRichTextBlock(id);
       }
