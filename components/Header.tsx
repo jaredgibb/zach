@@ -2,10 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { businessInfo } from '@/lib/data';
 
 export default function Header() {
       const [isOpen, setIsOpen] = useState(false);
+      const pathname = usePathname();
+
+      if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+            return null;
+      }
 
       const navigation = [
             { name: 'About Us', href: '/about' },

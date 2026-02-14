@@ -1,7 +1,16 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { businessInfo, insuranceProviders } from '@/lib/data';
 
 export default function Footer() {
+      const pathname = usePathname();
+
+      if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+            return null;
+      }
+
       return (
             <footer className="bg-gray-900 text-gray-300">
                   <div className="container-custom py-12">

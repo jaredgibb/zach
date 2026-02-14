@@ -4,14 +4,11 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTherapists, type Therapist } from '@/lib/hooks/useDatabase';
 import { storage } from '@/lib/supabase/client';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import YooptaEditor, { createYooptaEditor, type YooptaContentValue } from '@yoopta/editor';
+import { createYooptaEditor } from '@yoopta/editor';
 import {
       createTherapistBioContentFromPlainText,
       getTherapistBioPlainText,
       normalizeTherapistBioContent,
-      therapistBioMarks,
-      therapistBioPlugins,
-      therapistBioTools,
 } from '@/lib/yooptaTherapistBio';
 
 interface TherapistFormProps {
@@ -53,14 +50,16 @@ export default function TherapistForm({
       const [uploadProgress, setUploadProgress] = useState(0);
       const [isImageDragOver, setIsImageDragOver] = useState(false);
       const [formData, setFormData] = useState<Partial<Therapist>>(() => getDefaultFormData(nextOrderIndex));
-      const [fullBioContent, setFullBioContent] = useState<YooptaContentValue | undefined>(undefined);
+      const [specialtiesInput, setSpecialtiesInput] = useState('');
+      const [fullBioInput, setFullBioInput] = useState('');
       const imageInputRef = useRef<HTMLInputElement | null>(null);
 
       useEffect(() => {
             if (therapistId) {
                   if (!initialTherapist) {
                         setFormData(getDefaultFormData(nextOrderIndex));
-                        setFullBioContent(undefined);
+                        setSpecialtiesInput('');
+                        setFullBioInput('');
                         return;
                   }
 
@@ -69,20 +68,17 @@ export default function TherapistForm({
                         fun_fact: initialTherapist.fun_fact ?? '',
                         image_url: initialTherapist.image_url ?? '',
                   });
+                  setSpecialtiesInput((initialTherapist.specialties ?? []).join('\n'));
 
                   const richBio = normalizeTherapistBioContent(initialTherapist.full_bio_rich);
-                  const fallbackRichBio = richBio
-                        ? null
-                        : createTherapistBioContentFromPlainText(
-                              fullBioEditor,
-                              initialTherapist.full_bio ?? ''
-                        );
-                  setFullBioContent(richBio ?? fallbackRichBio ?? undefined);
+                  const plainBioFromRich = richBio ? getTherapistBioPlainText(fullBioEditor, richBio) : '';
+                  setFullBioInput(initialTherapist.full_bio?.trim() ? initialTherapist.full_bio : plainBioFromRich);
                   return;
             }
 
             setFormData(getDefaultFormData(nextOrderIndex));
-            setFullBioContent(undefined);
+            setSpecialtiesInput('');
+            setFullBioInput('');
       }, [therapistId, initialTherapist, nextOrderIndex, fullBioEditor]);
 
       useEffect(() => {
@@ -173,13 +169,8 @@ export default function TherapistForm({
             setLoading(true);
 
             try {
-                  const richFullBio = normalizeTherapistBioContent(fullBioContent);
-                  const fallbackFullBio = (formData.full_bio || '').trim();
-                  const normalizedFullBio = richFullBio
-                        ? getTherapistBioPlainText(fullBioEditor, richFullBio)
-                        : fullBioContent === undefined
-                              ? fallbackFullBio
-                              : '';
+                  const normalizedFullBio = fullBioInput.trim();
+                  const richFullBio = createTherapistBioContentFromPlainText(fullBioEditor, fullBioInput);
 
                   if (!normalizedFullBio) {
                         setError('Full biography is required.');
@@ -187,7 +178,8 @@ export default function TherapistForm({
                   }
 
                   const parsedOrderIndex = Number(formData.order_index);
-                  const specialties = (formData.specialties || [])
+                  const specialties = specialtiesInput
+                        .split('\n')
                         .map((specialty) => specialty.trim())
                         .filter((specialty) => specialty.length > 0);
 
@@ -224,9 +216,8 @@ export default function TherapistForm({
             setFormData((prev) => ({ ...prev, [name]: value }));
       };
 
-      const handleSpecialtiesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const specialties = e.target.value.split(',').map((s) => s.trim());
-            setFormData((prev) => ({ ...prev, specialties }));
+      const handleSpecialtiesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setSpecialtiesInput(e.target.value);
       };
 
       return (
@@ -301,25 +292,17 @@ export default function TherapistForm({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                               Full Biography <span className="text-red-500">*</span>
                         </label>
-                        <div className="rounded-lg border border-gray-300 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
-                              <YooptaEditor
-                                    editor={fullBioEditor}
-                                    plugins={therapistBioPlugins}
-                                    marks={therapistBioMarks}
-                                    tools={therapistBioTools}
-                                    value={fullBioContent}
-                                    onChange={(value) => setFullBioContent(value)}
-                                    autoFocus={false}
-                                    placeholder="Write the complete therapist biography..."
-                                    style={{
-                                          width: '100%',
-                                          minHeight: 220,
-                                          paddingBottom: 24,
-                                    }}
-                              />
-                        </div>
+                        <textarea
+                              name="full_bio"
+                              rows={10}
+                              value={fullBioInput}
+                              onChange={(event) => setFullBioInput(event.target.value)}
+                              required
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                              placeholder="Write the complete therapist biography..."
+                        />
                         <p className="mt-2 text-xs text-gray-500">
-                              Use headings, lists, and basic formatting to control how this appears in the therapist profile modal.
+                              Press Enter for new lines. Blank lines create separate paragraphs in the profile modal.
                         </p>
                   </div>
 
@@ -412,12 +395,12 @@ export default function TherapistForm({
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Specialties (comma-separated)
+                              Specialties (one per line)
                         </label>
-                        <input
-                              type="text"
-                              placeholder="e.g., Anxiety, Depression, Trauma"
-                              value={(formData.specialties || []).join(', ')}
+                        <textarea
+                              rows={4}
+                              placeholder={'e.g., Anxiety\nDepression\nTrauma'}
+                              value={specialtiesInput}
                               onChange={handleSpecialtiesChange}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />

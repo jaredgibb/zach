@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { businessInfo } from '@/lib/data';
 
 export default function ClientPortalBanner() {
+      const pathname = usePathname();
+
+      if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+            return null;
+      }
+
       return (
             <div className="bg-primary-700 text-white py-2 text-center text-sm">
                   <div className="container-custom">

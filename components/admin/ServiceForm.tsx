@@ -1,16 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import YooptaEditor, { createYooptaEditor, type YooptaContentValue } from '@yoopta/editor';
+import { useEffect, useRef, useState } from 'react';
 import { useServices, type Service } from '@/lib/hooks/useDatabase';
-import {
-      createTherapistBioContentFromPlainText,
-      getTherapistBioPlainText,
-      normalizeTherapistBioContent,
-      therapistBioMarks,
-      therapistBioPlugins,
-      therapistBioTools,
-} from '@/lib/yooptaTherapistBio';
 import { uploadAdminImage } from '@/lib/uploadAdminImage';
 
 interface ServiceFormProps {
@@ -41,7 +32,6 @@ export default function ServiceForm({
       onSuccess,
 }: ServiceFormProps) {
       const { updateService, addService } = useServices();
-      const fullDescriptionEditor = useMemo(() => createYooptaEditor(), []);
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState('');
       const [showImagePreview, setShowImagePreview] = useState(true);
@@ -50,7 +40,6 @@ export default function ServiceForm({
       const [isImageDragOver, setIsImageDragOver] = useState(false);
       const [formData, setFormData] = useState<Partial<Service>>(() => getDefaultFormData(nextOrderIndex));
       const [featuresInput, setFeaturesInput] = useState('');
-      const [fullDescriptionContent, setFullDescriptionContent] = useState<YooptaContentValue | undefined>(undefined);
       const imageInputRef = useRef<HTMLInputElement | null>(null);
 
       useEffect(() => {
@@ -58,7 +47,6 @@ export default function ServiceForm({
                   if (!initialService) {
                         setFormData(getDefaultFormData(nextOrderIndex));
                         setFeaturesInput('');
-                        setFullDescriptionContent(undefined);
                         return;
                   }
 
@@ -67,22 +55,12 @@ export default function ServiceForm({
                         image_url: initialService.image_url ?? null,
                   });
                   setFeaturesInput((initialService.features ?? []).join('\n'));
-
-                  const richDescription = normalizeTherapistBioContent(initialService.full_description_rich);
-                  const fallbackRichDescription = richDescription
-                        ? null
-                        : createTherapistBioContentFromPlainText(
-                              fullDescriptionEditor,
-                              initialService.full_description ?? '',
-                        );
-                  setFullDescriptionContent(richDescription ?? fallbackRichDescription ?? undefined);
                   return;
             }
 
             setFormData(getDefaultFormData(nextOrderIndex));
             setFeaturesInput('');
-            setFullDescriptionContent(undefined);
-      }, [serviceId, initialService, nextOrderIndex, fullDescriptionEditor]);
+      }, [serviceId, initialService, nextOrderIndex]);
 
       useEffect(() => {
             setShowImagePreview(true);
@@ -151,13 +129,7 @@ export default function ServiceForm({
             setLoading(true);
 
             try {
-                  const richDescription = normalizeTherapistBioContent(fullDescriptionContent);
-                  const fallbackDescription = (formData.full_description || '').trim();
-                  const normalizedFullDescription = richDescription
-                        ? getTherapistBioPlainText(fullDescriptionEditor, richDescription)
-                        : fullDescriptionContent === undefined
-                              ? fallbackDescription
-                              : '';
+                  const normalizedFullDescription = (formData.full_description || '').trim();
 
                   if (!normalizedFullDescription) {
                         setError('Full description is required.');
@@ -175,7 +147,7 @@ export default function ServiceForm({
                         slug: (formData.slug || '').trim(),
                         short_description: (formData.short_description || '').trim(),
                         full_description: normalizedFullDescription,
-                        full_description_rich: richDescription,
+                        full_description_rich: null,
                         image_url: typeof formData.image_url === 'string'
                               ? formData.image_url.trim() || null
                               : formData.image_url ?? null,
@@ -206,8 +178,30 @@ export default function ServiceForm({
             setFeaturesInput(e.target.value);
       };
 
+      const handleFormKeyDown = (event: React.KeyboardEvent<HTMLFormElement>) => {
+            if (event.key !== 'Enter') {
+                  return;
+            }
+
+            const target = event.target as HTMLElement;
+
+            if (target instanceof HTMLTextAreaElement) {
+                  return;
+            }
+
+            if (target.closest('[contenteditable="true"]')) {
+                  return;
+            }
+
+            if (target instanceof HTMLButtonElement && target.type === 'submit') {
+                  return;
+            }
+
+            event.preventDefault();
+      };
+
       return (
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+            <form onSubmit={handleSubmit} onKeyDown={handleFormKeyDown} className="space-y-6 max-w-2xl">
                   {error && (
                         <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
                               {error}
@@ -261,27 +255,17 @@ export default function ServiceForm({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                               Full Description <span className="text-red-500">*</span>
                         </label>
-                        <div className="rounded-lg border border-gray-300 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
-                              <YooptaEditor
-                                    editor={fullDescriptionEditor}
-                                    plugins={therapistBioPlugins}
-                                    marks={therapistBioMarks}
-                                    tools={therapistBioTools}
-                                    value={fullDescriptionContent}
-                                    onChange={(value) => setFullDescriptionContent(value)}
-                                    autoFocus={false}
-                                    readOnly={false}
-                                    selectionBoxRoot={false}
-                                    placeholder="Write the full service description..."
-                                    style={{
-                                          width: '100%',
-                                          minHeight: 220,
-                                          paddingBottom: 24,
-                                    }}
-                              />
-                        </div>
+                        <textarea
+                              name="full_description"
+                              rows={8}
+                              value={formData.full_description || ''}
+                              onChange={handleChange}
+                              required
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                              placeholder="Write the full service description..."
+                        />
                         <p className="mt-2 text-xs text-gray-500">
-                              Use headings, lists, and formatting to control how this appears in the service modal.
+                              You can enter multiple paragraphs. Press Enter for new lines.
                         </p>
                   </div>
 

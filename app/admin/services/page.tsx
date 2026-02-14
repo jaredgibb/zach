@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ServiceForm from '@/components/admin/ServiceForm';
 import ServiceList from '@/components/admin/ServiceList';
+import { Modal } from '@/components/Modal';
 
 export default function ServicesAdminPage() {
       const { user, isAdmin, loading: authLoading, error } = useAdmin();
@@ -14,11 +15,30 @@ export default function ServicesAdminPage() {
       const [showForm, setShowForm] = useState(false);
       const [editingId, setEditingId] = useState<string | null>(null);
       const router = useRouter();
+      const nextOrderIndex = services.length;
+      const selectedService = editingId
+            ? services.find((service) => service.id === editingId) ?? null
+            : null;
 
       const refreshServices = useCallback(
             () => fetchServices({ activeOnly: false }),
             [fetchServices]
       );
+
+      const closeForm = () => {
+            setShowForm(false);
+            setEditingId(null);
+      };
+
+      const openAddForm = () => {
+            setEditingId(null);
+            setShowForm(true);
+      };
+
+      const openEditForm = (id: string) => {
+            setEditingId(id);
+            setShowForm(true);
+      };
 
       useEffect(() => {
             if (!authLoading && !user) {
@@ -88,13 +108,10 @@ export default function ServicesAdminPage() {
                                           <h1 className="text-3xl font-bold text-gray-900">Manage Services</h1>
                                     </div>
                                     <button
-                                          onClick={() => {
-                                                setEditingId(null);
-                                                setShowForm(!showForm);
-                                          }}
+                                          onClick={() => (showForm ? closeForm() : openAddForm())}
                                           className="btn-primary"
                                     >
-                                          {showForm ? 'Cancel' : '+ Add Service'}
+                                          {showForm ? 'Close Form' : '+ Add Service'}
                                     </button>
                               </div>
                         </div>
@@ -108,33 +125,31 @@ export default function ServicesAdminPage() {
                               </div>
                         )}
 
-                        {showForm && (
-                              <div className="mb-8 bg-white rounded-lg shadow-md p-8">
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                                          {editingId ? 'Edit Service' : 'Add New Service'}
-                                    </h2>
-                                    <ServiceForm
-                                          serviceId={editingId}
-                                          onSuccess={() => {
-                                                setShowForm(false);
-                                                setEditingId(null);
-                                                refreshServices();
-                                          }}
-                                    />
-                              </div>
-                        )}
-
                         <div className="bg-white rounded-lg shadow-md">
                               <ServiceList
                                     services={services}
-                                    onEdit={(id: string) => {
-                                          setEditingId(id);
-                                          setShowForm(true);
-                                    }}
+                                    onEdit={openEditForm}
                                     onRefresh={refreshServices}
                               />
                         </div>
                   </div>
+
+                  <Modal
+                        isOpen={showForm}
+                        onClose={closeForm}
+                        title={editingId ? 'Edit Service' : 'Add New Service'}
+                  >
+                        <ServiceForm
+                              key={editingId ?? 'new-service'}
+                              serviceId={editingId}
+                              initialService={selectedService}
+                              nextOrderIndex={nextOrderIndex}
+                              onSuccess={() => {
+                                    closeForm();
+                                    refreshServices();
+                              }}
+                        />
+                  </Modal>
             </div>
       );
 }
