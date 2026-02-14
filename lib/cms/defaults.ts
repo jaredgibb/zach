@@ -9,7 +9,11 @@ import type {
       CmsPageNav,
       CmsPageSeo,
       CmsPageSnapshot,
+      CmsPricingCardsBlock,
       CmsRichTextBlock,
+      CmsTeamGridBlock,
+      CmsTestimonialsBlock,
+      CmsVideoEmbedBlock,
 } from '@/lib/cms/types';
 
 export const DEFAULT_CMS_SEO: CmsPageSeo = {
@@ -160,6 +164,89 @@ export function createDefaultImageCarouselBlock(id: string): CmsImageCarouselBlo
       };
 }
 
+export function createDefaultTestimonialsBlock(id: string): CmsTestimonialsBlock {
+      return {
+            id,
+            type: 'testimonials',
+            visible: true,
+            data: {
+                  title: 'Testimonials',
+                  intro: '',
+                  layout: 'grid',
+                  items: [
+                        {
+                              quote: '',
+                              name: '',
+                              role: '',
+                              imageUrl: '',
+                              imageAlt: '',
+                        },
+                  ],
+            },
+      };
+}
+
+export function createDefaultPricingCardsBlock(id: string): CmsPricingCardsBlock {
+      return {
+            id,
+            type: 'pricing_cards',
+            visible: true,
+            data: {
+                  title: 'Pricing',
+                  intro: '',
+                  cards: [
+                        {
+                              name: 'Starter',
+                              price: '$99',
+                              interval: '/month',
+                              description: '',
+                              features: [''],
+                              ctaLabel: 'Get started',
+                              ctaHref: '/contact',
+                              featured: false,
+                        },
+                  ],
+            },
+      };
+}
+
+export function createDefaultVideoEmbedBlock(id: string): CmsVideoEmbedBlock {
+      return {
+            id,
+            type: 'video_embed',
+            visible: true,
+            data: {
+                  title: 'Video',
+                  embedUrl: '',
+                  caption: '',
+                  aspectRatio: '16:9',
+            },
+      };
+}
+
+export function createDefaultTeamGridBlock(id: string): CmsTeamGridBlock {
+      return {
+            id,
+            type: 'team_grid',
+            visible: true,
+            data: {
+                  title: 'Meet the Team',
+                  intro: '',
+                  columns: 3,
+                  members: [
+                        {
+                              name: '',
+                              role: '',
+                              bio: '',
+                              imageUrl: '',
+                              imageAlt: '',
+                              profileHref: '',
+                        },
+                  ],
+            },
+      };
+}
+
 export function createDefaultBlock(type: CmsBlock['type'], id: string): CmsBlock {
       switch (type) {
             case 'hero':
@@ -176,6 +263,14 @@ export function createDefaultBlock(type: CmsBlock['type'], id: string): CmsBlock
                   return createDefaultCmsLinksBlock(id);
             case 'image_carousel':
                   return createDefaultImageCarouselBlock(id);
+            case 'testimonials':
+                  return createDefaultTestimonialsBlock(id);
+            case 'pricing_cards':
+                  return createDefaultPricingCardsBlock(id);
+            case 'video_embed':
+                  return createDefaultVideoEmbedBlock(id);
+            case 'team_grid':
+                  return createDefaultTeamGridBlock(id);
             default:
                   return createDefaultRichTextBlock(id);
       }

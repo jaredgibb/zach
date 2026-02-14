@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function SignupPage() {
       const router = useRouter();
@@ -137,9 +138,9 @@ export default function SignupPage() {
                         <div className="mt-8 pt-8 border-t border-gray-200">
                               <p className="text-sm text-gray-600 text-center">
                                     Already have an account?{' '}
-                                    <a href="/admin/login" className="text-primary-600 hover:underline font-medium">
+                                    <Link href="/admin/login" className="text-primary-600 hover:underline font-medium">
                                           Sign in here
-                                    </a>
+                                    </Link>
                               </p>
                         </div>
                   </div>

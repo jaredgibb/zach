@@ -9,7 +9,11 @@ export type CmsBlockType =
       | 'faq'
       | 'cta_band'
       | 'cms_links'
-      | 'image_carousel';
+      | 'image_carousel'
+      | 'testimonials'
+      | 'pricing_cards'
+      | 'video_embed'
+      | 'team_grid';
 
 export interface CmsCtaLink {
       label: string;
@@ -85,6 +89,61 @@ export interface CmsImageCarouselBlockData {
       items: CmsCarouselItem[];
 }
 
+export interface CmsTestimonialItem {
+      quote: string;
+      name: string;
+      role: string;
+      imageUrl: string;
+      imageAlt: string;
+}
+
+export interface CmsTestimonialsBlockData {
+      title: string;
+      intro: string;
+      layout: 'grid' | 'stack';
+      items: CmsTestimonialItem[];
+}
+
+export interface CmsPricingCard {
+      name: string;
+      price: string;
+      interval: string;
+      description: string;
+      features: string[];
+      ctaLabel: string;
+      ctaHref: string;
+      featured: boolean;
+}
+
+export interface CmsPricingCardsBlockData {
+      title: string;
+      intro: string;
+      cards: CmsPricingCard[];
+}
+
+export interface CmsVideoEmbedBlockData {
+      title: string;
+      embedUrl: string;
+      caption: string;
+      aspectRatio: '16:9' | '4:3' | '1:1';
+}
+
+export interface CmsTeamMember {
+      name: string;
+      role: string;
+      bio: string;
+      imageUrl: string;
+      imageAlt: string;
+      profileHref: string;
+}
+
+export interface CmsTeamGridBlockData {
+      title: string;
+      intro: string;
+      columns: 2 | 3 | 4;
+      members: CmsTeamMember[];
+}
+
 interface CmsBaseBlock<TType extends CmsBlockType, TData> {
       id: string;
       type: TType;
@@ -106,6 +165,14 @@ export type CmsLinksBlock = CmsBaseBlock<'cms_links', CmsLinksBlockData>;
 
 export type CmsImageCarouselBlock = CmsBaseBlock<'image_carousel', CmsImageCarouselBlockData>;
 
+export type CmsTestimonialsBlock = CmsBaseBlock<'testimonials', CmsTestimonialsBlockData>;
+
+export type CmsPricingCardsBlock = CmsBaseBlock<'pricing_cards', CmsPricingCardsBlockData>;
+
+export type CmsVideoEmbedBlock = CmsBaseBlock<'video_embed', CmsVideoEmbedBlockData>;
+
+export type CmsTeamGridBlock = CmsBaseBlock<'team_grid', CmsTeamGridBlockData>;
+
 export type CmsBlock =
       | CmsHeroBlock
       | CmsRichTextBlock
@@ -113,7 +180,11 @@ export type CmsBlock =
       | CmsFaqBlock
       | CmsCtaBandBlock
       | CmsLinksBlock
-      | CmsImageCarouselBlock;
+      | CmsImageCarouselBlock
+      | CmsTestimonialsBlock
+      | CmsPricingCardsBlock
+      | CmsVideoEmbedBlock
+      | CmsTeamGridBlock;
 
 export interface CmsPageSeo {
       metaTitle: string;

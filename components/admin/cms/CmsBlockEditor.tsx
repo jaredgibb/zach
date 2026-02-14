@@ -32,7 +32,11 @@ import type {
       CmsFaqBlock,
       CmsImageCarouselBlock,
       CmsLinksBlock,
+      CmsPricingCardsBlock,
       CmsRichTextBlock,
+      CmsTeamGridBlock,
+      CmsTestimonialsBlock,
+      CmsVideoEmbedBlock,
 } from '@/lib/cms/types';
 
 interface CmsLinkSuggestion {
@@ -983,6 +987,873 @@ function ImageCarouselFields({
       );
 }
 
+function TestimonialsFields({
+      block,
+      onChange,
+}: {
+      block: CmsTestimonialsBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      return (
+            <div className="space-y-4">
+                  <input
+                        type="text"
+                        placeholder="Section title"
+                        value={block.data.title}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          title: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <textarea
+                        rows={3}
+                        placeholder="Intro"
+                        value={block.data.intro}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          intro: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <select
+                        value={block.data.layout}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          layout: event.target.value as 'grid' | 'stack',
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  >
+                        <option value="grid">Grid</option>
+                        <option value="stack">Stack</option>
+                  </select>
+
+                  <div className="space-y-3">
+                        {block.data.items.map((item, index) => (
+                              <div key={`${block.id}-testimonial-${index}`} className="rounded-lg border border-gray-200 p-3">
+                                    <textarea
+                                          rows={3}
+                                          placeholder="Quote"
+                                          value={item.quote}
+                                          onChange={(event) => {
+                                                const nextItems = [...block.data.items];
+                                                nextItems[index] = {
+                                                      ...nextItems[index],
+                                                      quote: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: {
+                                                            ...block.data,
+                                                            items: nextItems,
+                                                      },
+                                                });
+                                          }}
+                                          className="mb-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+
+                                    <div className="grid gap-2 md:grid-cols-2">
+                                          <input
+                                                type="text"
+                                                placeholder="Name"
+                                                value={item.name}
+                                                onChange={(event) => {
+                                                      const nextItems = [...block.data.items];
+                                                      nextItems[index] = {
+                                                            ...nextItems[index],
+                                                            name: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  items: nextItems,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                placeholder="Role / title"
+                                                value={item.role}
+                                                onChange={(event) => {
+                                                      const nextItems = [...block.data.items];
+                                                      nextItems[index] = {
+                                                            ...nextItems[index],
+                                                            role: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  items: nextItems,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                    </div>
+
+                                    <div className="mt-2 grid gap-2 md:grid-cols-2">
+                                          <input
+                                                type="text"
+                                                placeholder="Image URL (optional)"
+                                                value={item.imageUrl}
+                                                onChange={(event) => {
+                                                      const nextItems = [...block.data.items];
+                                                      nextItems[index] = {
+                                                            ...nextItems[index],
+                                                            imageUrl: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  items: nextItems,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                placeholder="Image alt text"
+                                                value={item.imageAlt}
+                                                onChange={(event) => {
+                                                      const nextItems = [...block.data.items];
+                                                      nextItems[index] = {
+                                                            ...nextItems[index],
+                                                            imageAlt: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  items: nextItems,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                    </div>
+
+                                    <div className="mt-2 text-right">
+                                          <button
+                                                type="button"
+                                                onClick={() => {
+                                                      const nextItems = block.data.items.filter((_, itemIndex) => itemIndex !== index);
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  items:
+                                                                        nextItems.length > 0
+                                                                              ? nextItems
+                                                                              : [{ quote: '', name: '', role: '', imageUrl: '', imageAlt: '' }],
+                                                            },
+                                                      });
+                                                }}
+                                                className="text-sm font-medium text-red-600 hover:underline"
+                                          >
+                                                Remove testimonial
+                                          </button>
+                                    </div>
+                              </div>
+                        ))}
+                  </div>
+
+                  <button
+                        type="button"
+                        onClick={() =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          items: [...block.data.items, { quote: '', name: '', role: '', imageUrl: '', imageAlt: '' }],
+                                    },
+                              })
+                        }
+                        className="text-sm font-medium text-primary-600 hover:underline"
+                  >
+                        + Add testimonial
+                  </button>
+            </div>
+      );
+}
+
+function PricingCardsFields({
+      block,
+      onChange,
+}: {
+      block: CmsPricingCardsBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      return (
+            <div className="space-y-4">
+                  <input
+                        type="text"
+                        placeholder="Section title"
+                        value={block.data.title}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          title: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <textarea
+                        rows={3}
+                        placeholder="Intro"
+                        value={block.data.intro}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          intro: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <div className="space-y-3">
+                        {block.data.cards.map((card, cardIndex) => (
+                              <div key={`${block.id}-pricing-${cardIndex}`} className="rounded-lg border border-gray-200 p-3">
+                                    <div className="grid gap-2 md:grid-cols-3">
+                                          <input
+                                                type="text"
+                                                placeholder="Plan name"
+                                                value={card.name}
+                                                onChange={(event) => {
+                                                      const nextCards = [...block.data.cards];
+                                                      nextCards[cardIndex] = {
+                                                            ...nextCards[cardIndex],
+                                                            name: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards: nextCards,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                placeholder="Price"
+                                                value={card.price}
+                                                onChange={(event) => {
+                                                      const nextCards = [...block.data.cards];
+                                                      nextCards[cardIndex] = {
+                                                            ...nextCards[cardIndex],
+                                                            price: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards: nextCards,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                placeholder="Interval (optional)"
+                                                value={card.interval}
+                                                onChange={(event) => {
+                                                      const nextCards = [...block.data.cards];
+                                                      nextCards[cardIndex] = {
+                                                            ...nextCards[cardIndex],
+                                                            interval: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards: nextCards,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                    </div>
+
+                                    <textarea
+                                          rows={2}
+                                          placeholder="Description"
+                                          value={card.description}
+                                          onChange={(event) => {
+                                                const nextCards = [...block.data.cards];
+                                                nextCards[cardIndex] = {
+                                                      ...nextCards[cardIndex],
+                                                      description: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: {
+                                                            ...block.data,
+                                                            cards: nextCards,
+                                                      },
+                                                });
+                                          }}
+                                          className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+
+                                    <div className="mt-2 space-y-2">
+                                          {card.features.map((feature, featureIndex) => (
+                                                <div key={`${block.id}-pricing-${cardIndex}-feature-${featureIndex}`} className="flex gap-2">
+                                                      <input
+                                                            type="text"
+                                                            placeholder="Feature"
+                                                            value={feature}
+                                                            onChange={(event) => {
+                                                                  const nextCards = [...block.data.cards];
+                                                                  const nextFeatures = [...nextCards[cardIndex].features];
+                                                                  nextFeatures[featureIndex] = event.target.value;
+                                                                  nextCards[cardIndex] = {
+                                                                        ...nextCards[cardIndex],
+                                                                        features: nextFeatures,
+                                                                  };
+                                                                  onChange({
+                                                                        ...block,
+                                                                        data: {
+                                                                              ...block.data,
+                                                                              cards: nextCards,
+                                                                        },
+                                                                  });
+                                                            }}
+                                                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                                      />
+                                                      <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                  const nextCards = [...block.data.cards];
+                                                                  const nextFeatures = nextCards[cardIndex].features.filter((_, index) => index !== featureIndex);
+                                                                  nextCards[cardIndex] = {
+                                                                        ...nextCards[cardIndex],
+                                                                        features: nextFeatures.length > 0 ? nextFeatures : [''],
+                                                                  };
+                                                                  onChange({
+                                                                        ...block,
+                                                                        data: {
+                                                                              ...block.data,
+                                                                              cards: nextCards,
+                                                                        },
+                                                                  });
+                                                            }}
+                                                            className="rounded-lg border border-gray-300 px-3 text-sm text-gray-700 hover:bg-gray-50"
+                                                      >
+                                                            Remove
+                                                      </button>
+                                                </div>
+                                          ))}
+                                          <button
+                                                type="button"
+                                                onClick={() => {
+                                                      const nextCards = [...block.data.cards];
+                                                      nextCards[cardIndex] = {
+                                                            ...nextCards[cardIndex],
+                                                            features: [...nextCards[cardIndex].features, ''],
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards: nextCards,
+                                                            },
+                                                      });
+                                                }}
+                                                className="text-sm font-medium text-primary-600 hover:underline"
+                                          >
+                                                + Add feature
+                                          </button>
+                                    </div>
+
+                                    <div className="mt-2 grid gap-2 md:grid-cols-2">
+                                          <input
+                                                type="text"
+                                                placeholder="CTA label"
+                                                value={card.ctaLabel}
+                                                onChange={(event) => {
+                                                      const nextCards = [...block.data.cards];
+                                                      nextCards[cardIndex] = {
+                                                            ...nextCards[cardIndex],
+                                                            ctaLabel: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards: nextCards,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                list={CMS_LINK_SUGGESTIONS_DATALIST_ID}
+                                                placeholder="CTA href"
+                                                value={card.ctaHref}
+                                                onChange={(event) => {
+                                                      const nextCards = [...block.data.cards];
+                                                      nextCards[cardIndex] = {
+                                                            ...nextCards[cardIndex],
+                                                            ctaHref: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards: nextCards,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                    </div>
+
+                                    <div className="mt-2 flex items-center justify-between">
+                                          <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                                                <input
+                                                      type="checkbox"
+                                                      checked={card.featured}
+                                                      onChange={(event) => {
+                                                            const nextCards = [...block.data.cards];
+                                                            nextCards[cardIndex] = {
+                                                                  ...nextCards[cardIndex],
+                                                                  featured: event.target.checked,
+                                                            };
+                                                            onChange({
+                                                                  ...block,
+                                                                  data: {
+                                                                        ...block.data,
+                                                                        cards: nextCards,
+                                                                  },
+                                                            });
+                                                      }}
+                                                />
+                                                Featured plan
+                                          </label>
+                                          <button
+                                                type="button"
+                                                onClick={() => {
+                                                      const nextCards = block.data.cards.filter((_, index) => index !== cardIndex);
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  cards:
+                                                                        nextCards.length > 0
+                                                                              ? nextCards
+                                                                              : [
+                                                                                      {
+                                                                                            name: 'Starter',
+                                                                                            price: '$99',
+                                                                                            interval: '/month',
+                                                                                            description: '',
+                                                                                            features: [''],
+                                                                                            ctaLabel: 'Get started',
+                                                                                            ctaHref: '/contact',
+                                                                                            featured: false,
+                                                                                      },
+                                                                                ],
+                                                            },
+                                                      });
+                                                }}
+                                                className="text-sm font-medium text-red-600 hover:underline"
+                                          >
+                                                Remove card
+                                          </button>
+                                    </div>
+                              </div>
+                        ))}
+                  </div>
+
+                  <button
+                        type="button"
+                        onClick={() =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          cards: [
+                                                ...block.data.cards,
+                                                {
+                                                      name: '',
+                                                      price: '',
+                                                      interval: '',
+                                                      description: '',
+                                                      features: [''],
+                                                      ctaLabel: '',
+                                                      ctaHref: '/contact',
+                                                      featured: false,
+                                                },
+                                          ],
+                                    },
+                              })
+                        }
+                        className="text-sm font-medium text-primary-600 hover:underline"
+                  >
+                        + Add pricing card
+                  </button>
+            </div>
+      );
+}
+
+function VideoEmbedFields({
+      block,
+      onChange,
+}: {
+      block: CmsVideoEmbedBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      return (
+            <div className="space-y-4">
+                  <input
+                        type="text"
+                        placeholder="Section title"
+                        value={block.data.title}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          title: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <input
+                        type="text"
+                        placeholder="Embed URL (YouTube/Vimeo/etc)"
+                        value={block.data.embedUrl}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          embedUrl: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <textarea
+                        rows={2}
+                        placeholder="Caption"
+                        value={block.data.caption}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          caption: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <select
+                        value={block.data.aspectRatio}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          aspectRatio: event.target.value as '16:9' | '4:3' | '1:1',
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  >
+                        <option value="16:9">16:9</option>
+                        <option value="4:3">4:3</option>
+                        <option value="1:1">1:1</option>
+                  </select>
+            </div>
+      );
+}
+
+function TeamGridFields({
+      block,
+      onChange,
+}: {
+      block: CmsTeamGridBlock;
+      onChange: (nextBlock: CmsBlock) => void;
+}) {
+      return (
+            <div className="space-y-4">
+                  <input
+                        type="text"
+                        placeholder="Section title"
+                        value={block.data.title}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          title: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <textarea
+                        rows={3}
+                        placeholder="Intro"
+                        value={block.data.intro}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          intro: event.target.value,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+
+                  <select
+                        value={block.data.columns}
+                        onChange={(event) =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          columns: Number(event.target.value) as 2 | 3 | 4,
+                                    },
+                              })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  >
+                        <option value={2}>2 columns</option>
+                        <option value={3}>3 columns</option>
+                        <option value={4}>4 columns</option>
+                  </select>
+
+                  <div className="space-y-3">
+                        {block.data.members.map((member, index) => (
+                              <div key={`${block.id}-member-${index}`} className="rounded-lg border border-gray-200 p-3">
+                                    <div className="grid gap-2 md:grid-cols-2">
+                                          <input
+                                                type="text"
+                                                placeholder="Name"
+                                                value={member.name}
+                                                onChange={(event) => {
+                                                      const nextMembers = [...block.data.members];
+                                                      nextMembers[index] = {
+                                                            ...nextMembers[index],
+                                                            name: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  members: nextMembers,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                placeholder="Role"
+                                                value={member.role}
+                                                onChange={(event) => {
+                                                      const nextMembers = [...block.data.members];
+                                                      nextMembers[index] = {
+                                                            ...nextMembers[index],
+                                                            role: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  members: nextMembers,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                    </div>
+
+                                    <textarea
+                                          rows={2}
+                                          placeholder="Bio"
+                                          value={member.bio}
+                                          onChange={(event) => {
+                                                const nextMembers = [...block.data.members];
+                                                nextMembers[index] = {
+                                                      ...nextMembers[index],
+                                                      bio: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: {
+                                                            ...block.data,
+                                                            members: nextMembers,
+                                                      },
+                                                });
+                                          }}
+                                          className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+
+                                    <div className="mt-2 grid gap-2 md:grid-cols-2">
+                                          <input
+                                                type="text"
+                                                placeholder="Image URL (optional)"
+                                                value={member.imageUrl}
+                                                onChange={(event) => {
+                                                      const nextMembers = [...block.data.members];
+                                                      nextMembers[index] = {
+                                                            ...nextMembers[index],
+                                                            imageUrl: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  members: nextMembers,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                          <input
+                                                type="text"
+                                                placeholder="Image alt text"
+                                                value={member.imageAlt}
+                                                onChange={(event) => {
+                                                      const nextMembers = [...block.data.members];
+                                                      nextMembers[index] = {
+                                                            ...nextMembers[index],
+                                                            imageAlt: event.target.value,
+                                                      };
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  members: nextMembers,
+                                                            },
+                                                      });
+                                                }}
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                          />
+                                    </div>
+
+                                    <input
+                                          type="text"
+                                          list={CMS_LINK_SUGGESTIONS_DATALIST_ID}
+                                          placeholder="Profile link (optional)"
+                                          value={member.profileHref}
+                                          onChange={(event) => {
+                                                const nextMembers = [...block.data.members];
+                                                nextMembers[index] = {
+                                                      ...nextMembers[index],
+                                                      profileHref: event.target.value,
+                                                };
+                                                onChange({
+                                                      ...block,
+                                                      data: {
+                                                            ...block.data,
+                                                            members: nextMembers,
+                                                      },
+                                                });
+                                          }}
+                                          className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                                    />
+
+                                    <div className="mt-2 text-right">
+                                          <button
+                                                type="button"
+                                                onClick={() => {
+                                                      const nextMembers = block.data.members.filter((_, memberIndex) => memberIndex !== index);
+                                                      onChange({
+                                                            ...block,
+                                                            data: {
+                                                                  ...block.data,
+                                                                  members:
+                                                                        nextMembers.length > 0
+                                                                              ? nextMembers
+                                                                              : [
+                                                                                      {
+                                                                                            name: '',
+                                                                                            role: '',
+                                                                                            bio: '',
+                                                                                            imageUrl: '',
+                                                                                            imageAlt: '',
+                                                                                            profileHref: '',
+                                                                                      },
+                                                                                ],
+                                                            },
+                                                      });
+                                                }}
+                                                className="text-sm font-medium text-red-600 hover:underline"
+                                          >
+                                                Remove member
+                                          </button>
+                                    </div>
+                              </div>
+                        ))}
+                  </div>
+
+                  <button
+                        type="button"
+                        onClick={() =>
+                              onChange({
+                                    ...block,
+                                    data: {
+                                          ...block.data,
+                                          members: [
+                                                ...block.data.members,
+                                                { name: '', role: '', bio: '', imageUrl: '', imageAlt: '', profileHref: '' },
+                                          ],
+                                    },
+                              })
+                        }
+                        className="text-sm font-medium text-primary-600 hover:underline"
+                  >
+                        + Add member
+                  </button>
+            </div>
+      );
+}
+
 function BlockFields({
       block,
       onChange,
@@ -1005,6 +1876,14 @@ function BlockFields({
                   return <CmsLinksFields block={block} onChange={onChange} />;
             case 'image_carousel':
                   return <ImageCarouselFields block={block} onChange={onChange} />;
+            case 'testimonials':
+                  return <TestimonialsFields block={block} onChange={onChange} />;
+            case 'pricing_cards':
+                  return <PricingCardsFields block={block} onChange={onChange} />;
+            case 'video_embed':
+                  return <VideoEmbedFields block={block} onChange={onChange} />;
+            case 'team_grid':
+                  return <TeamGridFields block={block} onChange={onChange} />;
             default:
                   return null;
       }
@@ -1086,6 +1965,18 @@ export default function CmsBlockEditor({
                               </button>
                               <button type="button" onClick={() => addBlock('image_carousel')} className="btn-secondary text-sm px-4 py-2">
                                     Image Carousel
+                              </button>
+                              <button type="button" onClick={() => addBlock('testimonials')} className="btn-secondary text-sm px-4 py-2">
+                                    Testimonials
+                              </button>
+                              <button type="button" onClick={() => addBlock('pricing_cards')} className="btn-secondary text-sm px-4 py-2">
+                                    Pricing Cards
+                              </button>
+                              <button type="button" onClick={() => addBlock('video_embed')} className="btn-secondary text-sm px-4 py-2">
+                                    Video Embed
+                              </button>
+                              <button type="button" onClick={() => addBlock('team_grid')} className="btn-secondary text-sm px-4 py-2">
+                                    Team Grid
                               </button>
                         </div>
                   </div>

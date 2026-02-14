@@ -18,6 +18,10 @@ function isValidHref(value: string): boolean {
       );
 }
 
+function isValidEmbedUrl(value: string): boolean {
+      return value.startsWith('https://') || value.startsWith('http://');
+}
+
 function parseSchemaJson(value: string): unknown {
       if (!value.trim()) {
             return null;
@@ -205,6 +209,102 @@ const imageCarouselBlockSchema = z.object({
       }),
 });
 
+const testimonialsBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('testimonials'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            intro: z.string().trim().max(1500),
+            layout: z.enum(['grid', 'stack']),
+            items: z
+                  .array(
+                        z.object({
+                              quote: z.string().trim().min(1).max(2400),
+                              name: z.string().trim().min(1).max(120),
+                              role: z.string().trim().max(160),
+                              imageUrl: z.string().trim().max(2048),
+                              imageAlt: z.string().trim().max(300),
+                        })
+                  )
+                  .max(30),
+      }),
+});
+
+const pricingCardsBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('pricing_cards'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            intro: z.string().trim().max(1500),
+            cards: z
+                  .array(
+                        z
+                              .object({
+                                    name: z.string().trim().min(1).max(120),
+                                    price: z.string().trim().min(1).max(80),
+                                    interval: z.string().trim().max(80),
+                                    description: z.string().trim().max(2000),
+                                    features: z.array(z.string().trim().min(1).max(180)).max(20),
+                                    ctaLabel: z.string().trim().min(1).max(80),
+                                    ctaHref: z.string().trim().min(1).max(1024),
+                                    featured: z.boolean(),
+                              })
+                              .refine((card) => isValidHref(card.ctaHref), {
+                                    message: 'Pricing card CTA href must start with /, http://, https://, mailto:, or tel:.',
+                                    path: ['ctaHref'],
+                              })
+                  )
+                  .max(12),
+      }),
+});
+
+const videoEmbedBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('video_embed'),
+      visible: z.boolean(),
+      data: z
+            .object({
+                  title: z.string().trim().max(160),
+                  embedUrl: z.string().trim().min(1).max(2048),
+                  caption: z.string().trim().max(500),
+                  aspectRatio: z.enum(['16:9', '4:3', '1:1']),
+            })
+            .refine((data) => isValidEmbedUrl(data.embedUrl), {
+                  message: 'Video embed URL must start with http:// or https://.',
+                  path: ['embedUrl'],
+            }),
+});
+
+const teamGridBlockSchema = z.object({
+      id: z.string().trim().min(1).max(80),
+      type: z.literal('team_grid'),
+      visible: z.boolean(),
+      data: z.object({
+            title: z.string().trim().max(160),
+            intro: z.string().trim().max(1500),
+            columns: z.union([z.literal(2), z.literal(3), z.literal(4)]),
+            members: z
+                  .array(
+                        z
+                              .object({
+                                    name: z.string().trim().min(1).max(120),
+                                    role: z.string().trim().max(160),
+                                    bio: z.string().trim().max(2000),
+                                    imageUrl: z.string().trim().max(2048),
+                                    imageAlt: z.string().trim().max(300),
+                                    profileHref: z.string().trim().max(1024),
+                              })
+                              .refine((member) => !member.profileHref || isValidHref(member.profileHref), {
+                                    message: 'Profile link must start with /, http://, https://, mailto:, or tel:.',
+                                    path: ['profileHref'],
+                              })
+                  )
+                  .max(24),
+      }),
+});
+
 export const cmsBlockSchema = z.discriminatedUnion('type', [
       heroBlockSchema,
       richTextBlockSchema,
@@ -213,6 +313,10 @@ export const cmsBlockSchema = z.discriminatedUnion('type', [
       ctaBandBlockSchema,
       cmsLinksBlockSchema,
       imageCarouselBlockSchema,
+      testimonialsBlockSchema,
+      pricingCardsBlockSchema,
+      videoEmbedBlockSchema,
+      teamGridBlockSchema,
 ]);
 
 export const cmsSeoSchema = z

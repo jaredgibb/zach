@@ -6,11 +6,15 @@ import { useParams, useRouter } from 'next/navigation';
 import CmsBlockEditor from '@/components/admin/cms/CmsBlockEditor';
 import { cmsAdminRequest } from '@/lib/cms/admin-client';
 import { createDefaultSnapshot } from '@/lib/cms/defaults';
-import type { CmsPage, CmsPageSnapshot } from '@/lib/cms/types';
+import type { CmsPage, CmsPageListItem, CmsPageSnapshot } from '@/lib/cms/types';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 
 interface PageResponse {
       page: CmsPage;
+}
+
+interface PageListResponse {
+      pages: CmsPageListItem[];
 }
 
 export default function AdminPageEditor() {
@@ -28,6 +32,7 @@ export default function AdminPageEditor() {
       const [publishing, setPublishing] = useState(false);
       const [error, setError] = useState('');
       const [success, setSuccess] = useState('');
+      const [cmsLinkSuggestions, setCmsLinkSuggestions] = useState<Array<{ label: string; href: string }>>([]);
 
       useEffect(() => {
             if (!authLoading && !user) {
@@ -44,13 +49,24 @@ export default function AdminPageEditor() {
             setError('');
 
             try {
-                  const payload = await cmsAdminRequest<PageResponse>(`/api/admin/pages/${pageId}`);
-                  const pageData = payload.page;
+                  const [pagePayload, listPayload] = await Promise.all([
+                        cmsAdminRequest<PageResponse>(`/api/admin/pages/${pageId}`),
+                        cmsAdminRequest<PageListResponse>('/api/admin/pages'),
+                  ]);
+                  const pageData = pagePayload.page;
 
                   setPage(pageData);
                   setTitle(pageData.draft.title || '');
                   setSlug(pageData.slug || '');
                   setDraft(pageData.draft);
+                  setCmsLinkSuggestions(
+                        (listPayload.pages ?? [])
+                              .filter((candidate) => candidate.status === 'published' && candidate.path)
+                              .map((candidate) => ({
+                                    label: candidate.title || candidate.path,
+                                    href: candidate.path,
+                              }))
+                  );
             } catch (requestError) {
                   setError(requestError instanceof Error ? requestError.message : 'Failed to load page.');
             } finally {
@@ -509,6 +525,7 @@ export default function AdminPageEditor() {
                               <h2 className="text-xl font-bold text-gray-900">Blocks</h2>
                               <CmsBlockEditor
                                     blocks={draft.blocks}
+                                    cmsLinkSuggestions={cmsLinkSuggestions}
                                     onChange={(nextBlocks) =>
                                           setDraft((current) => ({
                                                 ...current,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Modal } from '@/components/Modal';
 import type { Service } from '@/lib/hooks/useDatabase';
 
@@ -127,12 +128,12 @@ export function ServiceCard({ service }: ServiceCardProps) {
                                     >
                                           Close
                                     </button>
-                                    <a
+                                    <Link
                                           href="/contact"
                                           className="flex-1 btn-primary text-center"
                                     >
                                           Schedule Now
-                                    </a>
+                                    </Link>
                               </div>
                         </div>
                   </Modal>

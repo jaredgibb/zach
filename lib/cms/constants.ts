@@ -60,4 +60,8 @@ export const CMS_BLOCK_TYPES = [
       'cta_band',
       'cms_links',
       'image_carousel',
+      'testimonials',
+      'pricing_cards',
+      'video_embed',
+      'team_grid',
 ] as const;

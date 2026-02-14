@@ -39,6 +39,35 @@ function getFallbackDescription(blocks: CmsBlock[]): string {
                         return firstCaption.slice(0, 155);
                   }
             }
+
+            if (block.type === 'testimonials') {
+                  const firstQuote = block.data.items.find((item) => item.quote.trim())?.quote ?? '';
+                  if (firstQuote) {
+                        return firstQuote.slice(0, 155);
+                  }
+            }
+
+            if (block.type === 'pricing_cards') {
+                  const firstDescription = block.data.cards.find((card) => card.description.trim())?.description ?? '';
+                  if (firstDescription) {
+                        return firstDescription.slice(0, 155);
+                  }
+            }
+
+            if (block.type === 'video_embed' && block.data.caption.trim()) {
+                  return block.data.caption.slice(0, 155);
+            }
+
+            if (block.type === 'team_grid') {
+                  if (block.data.intro.trim()) {
+                        return block.data.intro.slice(0, 155);
+                  }
+
+                  const firstBio = block.data.members.find((member) => member.bio.trim())?.bio ?? '';
+                  if (firstBio) {
+                        return firstBio.slice(0, 155);
+                  }
+            }
       }
 
       return '';
