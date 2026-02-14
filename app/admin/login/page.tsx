@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/supabase/client';
+import { getClientAuth } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -19,7 +19,7 @@ export default function LoginPage() {
             setLoading(true);
 
             try {
-                  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                  const userCredential = await signInWithEmailAndPassword(getClientAuth(), email, password);
 
                   if (userCredential.user) {
                         router.push('/admin/dashboard');

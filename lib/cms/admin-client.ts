@@ -1,8 +1,9 @@
 'use client';
 
-import { auth } from '@/lib/supabase/client';
+import { getClientAuth } from '@/lib/supabase/client';
 
 export async function cmsAdminRequest<T>(input: string, init: RequestInit = {}): Promise<T> {
+      const auth = getClientAuth();
       const user = auth.currentUser;
       if (!user) {
             throw new Error('You must be signed in as an admin.');

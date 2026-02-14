@@ -82,8 +82,8 @@ export default function ServicesAdminPage() {
                               )}
                               <button
                                     onClick={async () => {
-                                          const { auth } = await import('@/lib/supabase/client');
-                                          await auth.signOut();
+                                          const { getClientAuth } = await import('@/lib/supabase/client');
+                                          await getClientAuth().signOut();
                                           router.push('/admin/login');
                                     }}
                                     className="btn-primary"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { auth } from '@/lib/supabase/client';
+import { getClientAuth } from '@/lib/supabase/client';
 import {
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
@@ -14,21 +14,32 @@ export function useAuth() {
       const [error, setError] = useState<string | null>(null);
 
       useEffect(() => {
-            // Listen for auth state changes
-            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                  setUser(currentUser);
-                  setLoading(false);
-            }, (err) => {
-                  setError(err?.message || 'Failed to get user');
-                  setLoading(false);
-            });
+            let unsubscribe: ReturnType<typeof onAuthStateChanged> | null = null;
 
-            return () => unsubscribe();
+            try {
+                  const auth = getClientAuth();
+                  // Listen for auth state changes
+                  unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                        setUser(currentUser);
+                        setLoading(false);
+                  }, (err) => {
+                        setError(err?.message || 'Failed to get user');
+                        setLoading(false);
+                  });
+            } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Failed to initialize auth');
+                  setLoading(false);
+            }
+
+            return () => {
+                  unsubscribe?.();
+            };
       }, []);
 
       const signUp = async (email: string, password: string) => {
             try {
                   setError(null);
+                  const auth = getClientAuth();
                   const result = await createUserWithEmailAndPassword(auth, email, password);
                   setUser(result.user);
                   return result.user;
@@ -42,6 +53,7 @@ export function useAuth() {
       const signIn = async (email: string, password: string) => {
             try {
                   setError(null);
+                  const auth = getClientAuth();
                   const result = await signInWithEmailAndPassword(auth, email, password);
                   setUser(result.user);
                   return result.user;
@@ -55,6 +67,7 @@ export function useAuth() {
       const logout = async () => {
             try {
                   setError(null);
+                  const auth = getClientAuth();
                   await signOut(auth);
                   setUser(null);
             } catch (err) {

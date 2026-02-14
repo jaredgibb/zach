@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { db } from '@/lib/supabase/client';
+import { getClientDb } from '@/lib/supabase/client';
 import {
       collection,
       getDocs,
@@ -117,7 +117,7 @@ export function useTherapists() {
             setLoading(true);
             setError(null);
             try {
-                  const therapistsRef = collection(db, 'therapists');
+                  const therapistsRef = collection(getClientDb(), 'therapists');
                   const snapshot = await getDocs(therapistsRef);
                   const data = snapshot.docs
                         .map((therapistDoc) => {
@@ -167,7 +167,7 @@ export function useTherapists() {
             async (therapist: Omit<Therapist, 'id' | 'created_at' | 'updated_at'>) => {
                   try {
                         setError(null);
-                        const therapistsRef = collection(db, 'therapists');
+                        const therapistsRef = collection(getClientDb(), 'therapists');
                         const now = new Date().toISOString();
                         const docRef = await addDoc(therapistsRef, {
                               ...therapist,
@@ -195,7 +195,7 @@ export function useTherapists() {
             async (id: string, updates: Partial<Therapist>) => {
                   try {
                         setError(null);
-                        const therapistRef = doc(db, 'therapists', id);
+                        const therapistRef = doc(getClientDb(), 'therapists', id);
                         const now = new Date().toISOString();
                         await updateDoc(therapistRef, {
                               ...updates,
@@ -219,7 +219,7 @@ export function useTherapists() {
             async (id: string) => {
                   try {
                         setError(null);
-                        const therapistRef = doc(db, 'therapists', id);
+                        const therapistRef = doc(getClientDb(), 'therapists', id);
                         await deleteDoc(therapistRef);
                         setTherapists((prev) => prev.filter((t) => t.id !== id));
                   } catch (err) {
@@ -252,7 +252,7 @@ export function useServices() {
             setLoading(true);
             setError(null);
             try {
-                  const servicesRef = collection(db, 'services');
+                  const servicesRef = collection(getClientDb(), 'services');
                   const snapshot = await getDocs(servicesRef);
                   const data = snapshot.docs
                         .map((serviceDoc) => {
@@ -297,7 +297,7 @@ export function useServices() {
             async (service: Omit<Service, 'id' | 'created_at' | 'updated_at'>) => {
                   try {
                         setError(null);
-                        const servicesRef = collection(db, 'services');
+                        const servicesRef = collection(getClientDb(), 'services');
                         const now = new Date().toISOString();
                         const docRef = await addDoc(servicesRef, {
                               ...service,
@@ -325,7 +325,7 @@ export function useServices() {
             async (id: string, updates: Partial<Service>) => {
                   try {
                         setError(null);
-                        const serviceRef = doc(db, 'services', id);
+                        const serviceRef = doc(getClientDb(), 'services', id);
                         const now = new Date().toISOString();
                         await updateDoc(serviceRef, {
                               ...updates,
@@ -349,7 +349,7 @@ export function useServices() {
             async (id: string) => {
                   try {
                         setError(null);
-                        const serviceRef = doc(db, 'services', id);
+                        const serviceRef = doc(getClientDb(), 'services', id);
                         await deleteDoc(serviceRef);
                         setServices((prev) => prev.filter((s) => s.id !== id));
                   } catch (err) {

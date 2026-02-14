@@ -1,4 +1,4 @@
-import { auth } from '@/lib/supabase/client';
+import { getClientAuth } from '@/lib/supabase/client';
 
 type UploadFolder = 'services' | 'therapists';
 
@@ -18,6 +18,7 @@ export async function uploadAdminImage({
       folder,
       recordId,
 }: UploadAdminImageOptions): Promise<string> {
+      const auth = getClientAuth();
       const currentUser = auth.currentUser;
 
       if (!currentUser) {

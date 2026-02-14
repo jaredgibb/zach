@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/supabase/client';
+import { getClientAuth } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -39,7 +39,7 @@ export default function SignupPage() {
             setLoading(true);
 
             try {
-                  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                  const userCredential = await createUserWithEmailAndPassword(getClientAuth(), email, password);
 
                   if (userCredential.user) {
                         setSuccess('Account created successfully! Redirecting to dashboard...');

@@ -45,8 +45,8 @@ export default function AdminDashboard() {
                               )}
                               <button
                                     onClick={async () => {
-                                          const { auth } = await import('@/lib/supabase/client');
-                                          await auth.signOut();
+                                          const { getClientAuth } = await import('@/lib/supabase/client');
+                                          await getClientAuth().signOut();
                                           router.push('/admin/login');
                                     }}
                                     className="btn-primary"
@@ -143,8 +143,8 @@ export default function AdminDashboard() {
                                     <li>
                                           <button
                                                 onClick={async () => {
-                                                      const { auth } = await import('@/lib/supabase/client');
-                                                      await auth.signOut();
+                                                      const { getClientAuth } = await import('@/lib/supabase/client');
+                                                      await getClientAuth().signOut();
                                                       router.push('/admin/login');
                                                 }}
                                                 className="text-red-600 hover:underline font-medium"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTherapists, type Therapist } from '@/lib/hooks/useDatabase';
-import { storage } from '@/lib/supabase/client';
+import { getClientStorage } from '@/lib/supabase/client';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { createYooptaEditor } from '@yoopta/editor';
 import {
@@ -98,7 +98,7 @@ export default function TherapistForm({
 
             const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase();
             const imagePath = `therapists/${therapistId ?? 'new'}/${Date.now()}-${fileName}`;
-            const storageRef = ref(storage, imagePath);
+            const storageRef = ref(getClientStorage(), imagePath);
 
             setError('');
             setIsUploadingImage(true);

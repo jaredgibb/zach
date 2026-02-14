@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/supabase/client';
+import { getClientDb } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 
 interface AdminRecord {
@@ -34,6 +34,7 @@ export function useAdmin() {
                   try {
                         setLoading(true);
                         setError(null);
+                        const db = getClientDb();
                         const adminRef = doc(db, 'admins', user.uid);
                         const snapshot = await getDoc(adminRef);
                         const data = snapshot.exists() ? (snapshot.data() as AdminRecord) : null;
