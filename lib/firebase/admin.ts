@@ -2,7 +2,7 @@ import 'server-only';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cert, getApps, initializeApp, type App, type ServiceAccount } from 'firebase-admin/app';
+import { applicationDefault, cert, getApps, initializeApp, type App, type ServiceAccount } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
@@ -13,10 +13,18 @@ const DEFAULT_SERVICE_ACCOUNT_PATH = path.join(
       'dps-website-zd-firebase-adminsdk-fbsvc-0f085f7df8.json',
 );
 
-function readServiceAccount(): ServiceAccount {
+function parseServiceAccount(json: string, source: string): ServiceAccount {
+      try {
+            return JSON.parse(json) as ServiceAccount;
+      } catch (error) {
+            throw new Error(`Invalid Firebase Admin service account JSON from ${source}: ${(error as Error).message}`);
+      }
+}
+
+function readServiceAccount(): ServiceAccount | null {
       const rawJson = process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT_JSON;
       if (rawJson) {
-            return JSON.parse(rawJson) as ServiceAccount;
+            return parseServiceAccount(rawJson, 'FIREBASE_ADMIN_SERVICE_ACCOUNT_JSON');
       }
 
       const configuredPath = process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT_PATH;
@@ -25,13 +33,11 @@ function readServiceAccount(): ServiceAccount {
             : DEFAULT_SERVICE_ACCOUNT_PATH;
 
       if (!fs.existsSync(resolvedPath)) {
-            throw new Error(
-                  'Firebase Admin credentials not found. Set FIREBASE_ADMIN_SERVICE_ACCOUNT_PATH or FIREBASE_ADMIN_SERVICE_ACCOUNT_JSON.',
-            );
+            return null;
       }
 
       const fileContents = fs.readFileSync(resolvedPath, 'utf8');
-      return JSON.parse(fileContents) as ServiceAccount;
+      return parseServiceAccount(fileContents, resolvedPath);
 }
 
 function getStorageBucket(): string | undefined {
@@ -57,7 +63,7 @@ function getAdminApp(): App {
       const storageBucket = getStorageBucket();
 
       return initializeApp({
-            credential: cert(serviceAccount),
+            credential: serviceAccount ? cert(serviceAccount) : applicationDefault(),
             storageBucket,
       });
 }
