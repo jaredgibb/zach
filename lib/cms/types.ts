@@ -28,6 +28,9 @@ export interface CmsHeroBlockData {
       subheadline: string;
       alignment: 'left' | 'center';
       theme: 'primary' | 'light' | 'dark';
+      backgroundImageUrl: string;
+      backgroundImageAlt: string;
+      overlayOpacity: number;
       ctaPrimary: CmsCtaLink | null;
       ctaSecondary: CmsCtaLink | null;
 }

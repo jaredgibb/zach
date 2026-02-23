@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import slugify from 'slugify';
 import { useServices, type Service } from '@/lib/hooks/useDatabase';
 import { uploadAdminImage } from '@/lib/uploadAdminImage';
 
@@ -23,6 +24,15 @@ function getDefaultFormData(orderIndex: number): Partial<Service> {
             is_active: true,
             order_index: orderIndex,
       };
+}
+
+function toSafeSlug(value: string, fallback: string): string {
+      const normalized = slugify(value.replace(/^\/+/, ''), { lower: true, strict: true, trim: true });
+      if (normalized) {
+            return normalized;
+      }
+
+      return slugify(fallback, { lower: true, strict: true, trim: true }) || 'service';
 }
 
 export default function ServiceForm({
@@ -131,20 +141,17 @@ export default function ServiceForm({
             try {
                   const normalizedFullDescription = (formData.full_description || '').trim();
 
-                  if (!normalizedFullDescription) {
-                        setError('Full description is required.');
-                        return;
-                  }
-
                   const parsedOrderIndex = Number(formData.order_index);
                   const features = featuresInput
                         .split('\n')
                         .map((feature) => feature.trim())
                         .filter((feature) => feature.length > 0);
+                  const safeTitle = (formData.title || '').trim();
+                  const slugSource = (formData.slug || '').trim() || safeTitle;
 
                   const payload: Omit<Service, 'id' | 'created_at' | 'updated_at'> = {
-                        title: (formData.title || '').trim(),
-                        slug: (formData.slug || '').trim(),
+                        title: safeTitle,
+                        slug: toSafeSlug(slugSource, safeTitle || 'service'),
                         short_description: (formData.short_description || '').trim(),
                         full_description: normalizedFullDescription,
                         full_description_rich: null,
@@ -224,45 +231,43 @@ export default function ServiceForm({
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              URL Slug <span className="text-red-500">*</span>
+                              URL Slug
                         </label>
                         <input
                               type="text"
                               name="slug"
-                              placeholder="e.g., individual-therapy"
+                              placeholder="Leave blank to auto-generate from title"
                               value={formData.slug || ''}
                               onChange={handleChange}
-                              required
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />
                   </div>
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Short Description <span className="text-red-500">*</span>
+                              Short Description
                         </label>
                         <textarea
                               name="short_description"
                               rows={2}
                               value={formData.short_description || ''}
                               onChange={handleChange}
-                              required
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                              placeholder="Optional for now - add a short summary later."
                         />
                   </div>
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Full Description <span className="text-red-500">*</span>
+                              Full Description
                         </label>
                         <textarea
                               name="full_description"
                               rows={8}
                               value={formData.full_description || ''}
                               onChange={handleChange}
-                              required
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="Write the full service description..."
+                              placeholder="Optional for now - write the full service description later."
                         />
                         <p className="mt-2 text-xs text-gray-500">
                               You can enter multiple paragraphs. Press Enter for new lines.

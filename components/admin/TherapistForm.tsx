@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import slugify from 'slugify';
 import { useTherapists, type Therapist } from '@/lib/hooks/useDatabase';
 import { getClientStorage } from '@/lib/supabase/client';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
@@ -33,6 +34,15 @@ function getDefaultFormData(orderIndex: number): Partial<Therapist> {
             order_index: orderIndex,
             slug: '',
       };
+}
+
+function toSafeSlug(value: string, fallback: string): string {
+      const normalized = slugify(value, { lower: true, strict: true, trim: true });
+      if (normalized) {
+            return normalized;
+      }
+
+      return slugify(fallback, { lower: true, strict: true, trim: true }) || 'therapist-profile';
 }
 
 export default function TherapistForm({
@@ -172,19 +182,16 @@ export default function TherapistForm({
                   const normalizedFullBio = fullBioInput.trim();
                   const richFullBio = createTherapistBioContentFromPlainText(fullBioEditor, fullBioInput);
 
-                  if (!normalizedFullBio) {
-                        setError('Full biography is required.');
-                        return;
-                  }
-
                   const parsedOrderIndex = Number(formData.order_index);
                   const specialties = specialtiesInput
                         .split('\n')
                         .map((specialty) => specialty.trim())
                         .filter((specialty) => specialty.length > 0);
 
+                  const safeName = (formData.name || '').trim();
+                  const slugSource = (formData.slug || '').trim() || safeName;
                   const payload: Omit<Therapist, 'id' | 'created_at' | 'updated_at'> = {
-                        name: (formData.name || '').trim(),
+                        name: safeName,
                         credentials: (formData.credentials || '').trim(),
                         title: (formData.title || '').trim(),
                         short_bio: (formData.short_bio || '').trim(),
@@ -193,7 +200,7 @@ export default function TherapistForm({
                         fun_fact: (formData.fun_fact || '').trim() || null,
                         specialties,
                         image_url: (formData.image_url || '').trim() || null,
-                        slug: (formData.slug || '').trim(),
+                        slug: toSafeSlug(slugSource, safeName || 'therapist'),
                         order_index: Number.isFinite(parsedOrderIndex) ? parsedOrderIndex : nextOrderIndex,
                         is_active: formData.is_active ?? true,
                   };
@@ -261,7 +268,7 @@ export default function TherapistForm({
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Title <span className="text-red-500">*</span>
+                              Title
                         </label>
                         <input
                               type="text"
@@ -269,37 +276,35 @@ export default function TherapistForm({
                               placeholder="e.g., Licensed Professional Counselor"
                               value={formData.title || ''}
                               onChange={handleChange}
-                              required
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />
                   </div>
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Short Bio <span className="text-red-500">*</span>
+                              Short Bio
                         </label>
                         <textarea
                               name="short_bio"
                               rows={2}
                               value={formData.short_bio || ''}
                               onChange={handleChange}
-                              required
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                              placeholder="Optional for now - add a short summary later."
                         />
                   </div>
 
                   <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Full Biography <span className="text-red-500">*</span>
+                              Full Biography
                         </label>
                         <textarea
                               name="full_bio"
                               rows={10}
                               value={fullBioInput}
                               onChange={(event) => setFullBioInput(event.target.value)}
-                              required
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="Write the complete therapist biography..."
+                              placeholder="Optional for now - write the complete therapist biography later."
                         />
                         <p className="mt-2 text-xs text-gray-500">
                               Press Enter for new lines. Blank lines create separate paragraphs in the profile modal.

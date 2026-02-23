@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { businessInfo, insuranceProviders } from '@/lib/data';
@@ -22,8 +23,19 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                               {/* Left Column - About */}
                               <div>
-                                    <div className="text-xl font-bold text-white mb-4">
-                                          Diversified<br />Psychological Services
+                                    <div className="mb-4 flex items-center gap-3">
+                                          <div className="rounded-lg bg-white/95 p-1.5 shadow-sm ring-1 ring-white/10">
+                                                <Image
+                                                      src="/branding/dps-logo-mark.png"
+                                                      alt="Diversified Psychological Services logo mark"
+                                                      width={28}
+                                                      height={48}
+                                                      className="h-10 w-auto"
+                                                />
+                                          </div>
+                                          <div className="text-xl font-bold leading-tight text-white">
+                                                Diversified<br />Psychological Services
+                                          </div>
                                     </div>
                                     <p className="text-sm mb-4">
                                           {businessInfo.aboutShort}

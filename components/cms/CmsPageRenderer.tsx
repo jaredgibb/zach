@@ -51,6 +51,7 @@ function renderHrefLink(href: string, children: React.ReactNode, className?: str
 function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
       const alignmentClass = block.data.alignment === 'center' ? 'text-center' : 'text-left';
       const alignItemsClass = block.data.alignment === 'center' ? 'mx-auto items-center' : 'items-start';
+      const hasBackgroundImage = Boolean(block.data.backgroundImageUrl?.trim());
       const themeClass =
             block.data.theme === 'light'
                   ? 'surface-warm text-slate-900'
@@ -58,9 +59,29 @@ function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
                         ? 'bg-slate-900 text-slate-100'
                         : 'bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500 text-white';
       const isDarkTheme = block.data.theme === 'dark' || block.data.theme === 'primary';
+      const overlayOpacity = Math.min(0.95, Math.max(0, Number.isFinite(block.data.overlayOpacity) ? block.data.overlayOpacity : 0.55));
 
       return (
             <section className={`relative overflow-hidden py-20 md:py-28 ${themeClass}`}>
+                  {hasBackgroundImage && (
+                        <>
+                              <img
+                                    src={block.data.backgroundImageUrl}
+                                    alt={block.data.backgroundImageAlt || block.data.headline}
+                                    className="absolute inset-0 h-full w-full object-cover"
+                              />
+                              <div
+                                    className={block.data.theme === 'light' ? 'absolute inset-0 bg-white' : 'absolute inset-0 bg-slate-950'}
+                                    style={{ opacity: overlayOpacity }}
+                              />
+                              {block.data.theme === 'light' && (
+                                    <div
+                                          className="absolute inset-0 bg-gradient-to-r from-white to-white/60"
+                                          style={{ opacity: Math.min(0.85, overlayOpacity + 0.1) }}
+                                    />
+                              )}
+                        </>
+                  )}
                   <div className="pointer-events-none absolute inset-0">
                         <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
                         <div className="absolute -bottom-20 left-0 h-72 w-72 rounded-full bg-primary-300/20 blur-3xl" />

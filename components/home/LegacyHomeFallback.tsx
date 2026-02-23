@@ -5,6 +5,126 @@ import Link from 'next/link';
 import { useTherapists, useServices } from '@/lib/hooks/useDatabase';
 import type { Therapist, Service } from '@/lib/hooks/useDatabase';
 
+const STOCK_THERAPY_IMAGES = {
+      hero: 'https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?auto=format&fit=crop&w=1800&q=80',
+      team: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80',
+      services: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=1400&q=80',
+      wellbeing: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
+};
+
+const PLACEHOLDER_THERAPISTS: Therapist[] = [
+      {
+            id: 'placeholder-alex-carter',
+            name: 'Alex Carter',
+            credentials: 'MA, LPC',
+            title: '',
+            short_bio: '',
+            full_bio: '',
+            full_bio_rich: null,
+            fun_fact: null,
+            specialties: [],
+            image_url: null,
+            slug: 'alex-carter',
+            order_index: 0,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-jordan-lee',
+            name: 'Jordan Lee',
+            credentials: 'MSW, LMSW',
+            title: '',
+            short_bio: '',
+            full_bio: '',
+            full_bio_rich: null,
+            fun_fact: null,
+            specialties: [],
+            image_url: null,
+            slug: 'jordan-lee',
+            order_index: 1,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-taylor-morgan',
+            name: 'Taylor Morgan',
+            credentials: 'PhD, LP',
+            title: '',
+            short_bio: '',
+            full_bio: '',
+            full_bio_rich: null,
+            fun_fact: null,
+            specialties: [],
+            image_url: null,
+            slug: 'taylor-morgan',
+            order_index: 2,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+];
+
+const PLACEHOLDER_SERVICES: Service[] = [
+      {
+            id: 'placeholder-individual-therapy',
+            title: 'Individual Therapy',
+            slug: 'individual-therapy',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 0,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-couples-counseling',
+            title: 'Couples Counseling',
+            slug: 'couples-counseling',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 1,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-family-therapy',
+            title: 'Family Therapy',
+            slug: 'family-therapy',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 2,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-telehealth',
+            title: 'Telehealth Sessions',
+            slug: 'telehealth-sessions',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 3,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+];
+
 export default function LegacyHomeFallback() {
       const { fetchTherapists } = useTherapists();
       const { fetchServices } = useServices();
@@ -30,10 +150,22 @@ export default function LegacyHomeFallback() {
             loadData();
       }, [fetchTherapists, fetchServices]);
 
+      const visibleTherapists = therapists.length > 0 ? therapists : PLACEHOLDER_THERAPISTS;
+      const visibleServices = services.length > 0 ? services : PLACEHOLDER_SERVICES;
+
       return (
             <div className="overflow-hidden">
                   {/* ===== SECTION 1: HERO ===== */}
                   <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary-600 via-primary-550 to-primary-700 text-white overflow-hidden">
+                        <div className="absolute inset-0">
+                              <img
+                                    src={STOCK_THERAPY_IMAGES.hero}
+                                    alt="Two people talking during a therapy session"
+                                    className="h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-slate-950/55"></div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-primary-900/75 via-primary-700/55 to-primary-500/35"></div>
+                        </div>
                         {/* Decorative gradient orbs */}
                         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-32 -mt-32"></div>
                         <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-32 mb-32"></div>
@@ -130,15 +262,34 @@ export default function LegacyHomeFallback() {
                               <div className="text-center mb-16">
                                     <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
                                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                                          {!isLoading && therapists.length > 0
-                                                ? `${therapists.length} experienced professionals ready to help`
+                                          {!isLoading && visibleTherapists.length > 0
+                                                ? `${visibleTherapists.length} experienced professionals ready to help`
                                                 : 'Experienced professionals ready to help you'
                                           }
                                     </p>
                               </div>
 
+                              <div className="mb-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-center rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                                    <div>
+                                          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700 mb-2">
+                                                Compassionate, Person-Centered Care
+                                          </p>
+                                          <p className="text-lg text-gray-700 leading-relaxed">
+                                                We are building out each provider profile. Names and credentials can be added first, and bios/photos can be added as they are ready.
+                                          </p>
+                                    </div>
+                                    <div className="relative h-60 overflow-hidden rounded-xl bg-gray-100">
+                                          <img
+                                                src={STOCK_THERAPY_IMAGES.team}
+                                                alt="A therapist speaking with a client in a comfortable office"
+                                                className="h-full w-full object-cover"
+                                          />
+                                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
+                                    </div>
+                              </div>
+
                               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                                    {therapists.slice(0, 3).map((therapist) => (
+                                    {visibleTherapists.slice(0, 3).map((therapist) => (
                                           <div key={therapist.id} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
                                                 {therapist.image_url ? (
                                                       <img
@@ -155,9 +306,15 @@ export default function LegacyHomeFallback() {
                                                 )}
                                                 <div className="p-6 bg-white">
                                                       <h3 className="text-xl font-bold text-gray-900">{therapist.name}</h3>
-                                                      <p className="text-primary-600 font-semibold text-sm mb-1">{therapist.credentials}</p>
-                                                      <p className="text-gray-600 text-sm mb-3">{therapist.title}</p>
-                                                      <p className="text-gray-700 text-sm leading-relaxed line-clamp-2">{therapist.short_bio}</p>
+                                                      {therapist.credentials.trim() && (
+                                                            <p className="text-primary-600 font-semibold text-sm mb-1">{therapist.credentials}</p>
+                                                      )}
+                                                      {therapist.title.trim() && (
+                                                            <p className="text-gray-600 text-sm mb-3">{therapist.title}</p>
+                                                      )}
+                                                      {therapist.short_bio.trim() && (
+                                                            <p className="text-gray-700 text-sm leading-relaxed line-clamp-2">{therapist.short_bio}</p>
+                                                      )}
                                                       <Link href="/therapists" className="inline-block mt-4 text-primary-600 font-semibold hover:underline">
                                                             View profile →
                                                       </Link>
@@ -187,8 +344,22 @@ export default function LegacyHomeFallback() {
                                     </p>
                               </div>
 
+                              <div className="mb-10 relative overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                                    <img
+                                          src={STOCK_THERAPY_IMAGES.services}
+                                          alt="Therapist and client talking in a counseling session"
+                                          className="h-56 w-full object-cover md:h-72"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950/65 via-slate-900/35 to-transparent" />
+                                    <div className="absolute inset-y-0 left-0 flex max-w-xl items-center p-6 md:p-8">
+                                          <p className="text-base md:text-lg leading-relaxed text-white">
+                                                Service descriptions can be expanded over time while the current layout continues to provide a clear, easy-to-navigate overview.
+                                          </p>
+                                    </div>
+                              </div>
+
                               <div className="grid md:grid-cols-2 gap-8">
-                                    {services.slice(0, 4).map((service) => (
+                                    {visibleServices.slice(0, 4).map((service) => (
                                           <div key={service.id} className="group p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary-300">
                                                 <div className="flex items-start">
                                                       <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary-200 transition-colors">
@@ -200,9 +371,11 @@ export default function LegacyHomeFallback() {
                                                             <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
                                                                   {service.title}
                                                             </h3>
-                                                            <p className="text-gray-600 mb-4 line-clamp-2">
-                                                                  {service.short_description}
-                                                            </p>
+                                                            {service.short_description.trim() && (
+                                                                  <p className="text-gray-600 mb-4 line-clamp-2">
+                                                                        {service.short_description}
+                                                                  </p>
+                                                            )}
                                                             <Link href="/services" className="text-primary-600 font-semibold text-sm hover:underline">
                                                                   Learn more →
                                                             </Link>
@@ -305,10 +478,19 @@ export default function LegacyHomeFallback() {
                                                 ))}
                                           </ul>
                                     </div>
-                                    <div className="relative h-96 bg-gradient-to-br from-primary-100 to-blue-100 rounded-2xl flex items-center justify-center shadow-lg">
-                                          <svg className="w-48 h-48 text-primary-300" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m0 0l-2-1m2 1v2.5M12 3l-2 1m0 0L8 3m2 1v2.5" />
-                                          </svg>
+                                    <div className="relative h-96 overflow-hidden rounded-2xl shadow-lg">
+                                          <img
+                                                src={STOCK_THERAPY_IMAGES.wellbeing}
+                                                alt="Therapist and client meeting in a calm setting"
+                                                className="h-full w-full object-cover"
+                                          />
+                                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/45 via-slate-900/10 to-transparent" />
+                                          <div className="absolute bottom-4 left-4 right-4 rounded-xl bg-white/90 p-4 backdrop-blur-sm">
+                                                <p className="text-sm font-semibold text-primary-700 mb-1">A welcoming place to start</p>
+                                                <p className="text-sm text-gray-700">
+                                                      Therapy can support everyday stress, life transitions, relationships, and long-term growth.
+                                                </p>
+                                          </div>
                                     </div>
                               </div>
                         </div>

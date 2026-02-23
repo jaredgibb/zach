@@ -224,6 +224,60 @@ function HeroFields({
                         </div>
                   </div>
 
+                  <div className="rounded-lg border border-gray-200 p-4 space-y-3">
+                        <p className="text-sm font-semibold text-gray-800">Optional Background Image</p>
+                        <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                              <input
+                                    type="text"
+                                    placeholder="https://example.com/therapy-session.jpg"
+                                    value={block.data.backgroundImageUrl ?? ''}
+                                    onChange={(event) =>
+                                          onChange({
+                                                ...block,
+                                                data: { ...block.data, backgroundImageUrl: event.target.value },
+                                          })
+                                    }
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                              />
+                        </div>
+                        <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Image Alt Text</label>
+                              <input
+                                    type="text"
+                                    placeholder="Therapist talking with a client in a calm office"
+                                    value={block.data.backgroundImageAlt ?? ''}
+                                    onChange={(event) =>
+                                          onChange({
+                                                ...block,
+                                                data: { ...block.data, backgroundImageAlt: event.target.value },
+                                          })
+                                    }
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                              />
+                        </div>
+                        <div>
+                              <div className="mb-1 flex items-center justify-between text-sm">
+                                    <label className="font-medium text-gray-700">Overlay Opacity</label>
+                                    <span className="text-gray-500">{Math.round((block.data.overlayOpacity ?? 0.55) * 100)}%</span>
+                              </div>
+                              <input
+                                    type="range"
+                                    min="0"
+                                    max="0.95"
+                                    step="0.05"
+                                    value={block.data.overlayOpacity ?? 0.55}
+                                    onChange={(event) =>
+                                          onChange({
+                                                ...block,
+                                                data: { ...block.data, overlayOpacity: Number(event.target.value) },
+                                          })
+                                    }
+                                    className="w-full"
+                              />
+                        </div>
+                  </div>
+
                   <div className="grid gap-4 md:grid-cols-2">
                         <div className="rounded-lg border border-gray-200 p-3">
                               <p className="text-sm font-semibold text-gray-800 mb-2">Primary CTA</p>

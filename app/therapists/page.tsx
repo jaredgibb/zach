@@ -5,6 +5,60 @@ import { TherapistCard } from '@/components/TherapistCard';
 import { useTherapists } from '@/lib/hooks/useDatabase';
 import type { Therapist } from '@/lib/hooks/useDatabase';
 
+const PLACEHOLDER_THERAPISTS: Therapist[] = [
+      {
+            id: 'placeholder-alex-carter',
+            name: 'Alex Carter',
+            credentials: 'MA, LPC',
+            title: '',
+            short_bio: '',
+            full_bio: '',
+            full_bio_rich: null,
+            fun_fact: null,
+            specialties: [],
+            image_url: null,
+            slug: 'alex-carter',
+            order_index: 0,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-jordan-lee',
+            name: 'Jordan Lee',
+            credentials: 'MSW, LMSW',
+            title: '',
+            short_bio: '',
+            full_bio: '',
+            full_bio_rich: null,
+            fun_fact: null,
+            specialties: [],
+            image_url: null,
+            slug: 'jordan-lee',
+            order_index: 1,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-taylor-morgan',
+            name: 'Taylor Morgan',
+            credentials: 'PhD, LP',
+            title: '',
+            short_bio: '',
+            full_bio: '',
+            full_bio_rich: null,
+            fun_fact: null,
+            specialties: [],
+            image_url: null,
+            slug: 'taylor-morgan',
+            order_index: 2,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+];
+
 export default function TherapistsPage() {
       const { fetchTherapists } = useTherapists();
       const [therapists, setTherapists] = useState<Therapist[]>([]);
@@ -46,6 +100,8 @@ export default function TherapistsPage() {
             );
       }
 
+      const visibleTherapists = therapists.length > 0 ? therapists : PLACEHOLDER_THERAPISTS;
+
       return (
             <div className="py-16">
                   <div className="container-custom">
@@ -57,7 +113,7 @@ export default function TherapistsPage() {
                         </p>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                              {therapists.map((therapist) => (
+                              {visibleTherapists.map((therapist) => (
                                     <TherapistCard key={therapist.id} therapist={therapist} />
                               ))}
                         </div>

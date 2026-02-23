@@ -6,6 +6,51 @@ import { ServiceCard } from '@/components/ServiceCard';
 import { useServices } from '@/lib/hooks/useDatabase';
 import type { Service } from '@/lib/hooks/useDatabase';
 
+const PLACEHOLDER_SERVICES: Service[] = [
+      {
+            id: 'placeholder-individual-therapy',
+            title: 'Individual Therapy',
+            slug: 'individual-therapy',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 0,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-couples-counseling',
+            title: 'Couples Counseling',
+            slug: 'couples-counseling',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 1,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-family-therapy',
+            title: 'Family Therapy',
+            slug: 'family-therapy',
+            short_description: '',
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 2,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+];
+
 export default function ServicesPage() {
       const { fetchServices } = useServices();
       const [services, setServices] = useState<Service[]>([]);
@@ -47,6 +92,8 @@ export default function ServicesPage() {
             );
       }
 
+      const visibleServices = services.length > 0 ? services : PLACEHOLDER_SERVICES;
+
       return (
             <div className="py-16">
                   <div className="container-custom">
@@ -59,7 +106,7 @@ export default function ServicesPage() {
 
                         {/* Services Grid */}
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 max-w-6xl mx-auto">
-                              {services.map((service) => (
+                              {visibleServices.map((service) => (
                                     <ServiceCard key={service.id} service={service} />
                               ))}
                         </div>

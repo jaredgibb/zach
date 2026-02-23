@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -36,9 +37,21 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                         <div className="flex justify-between items-center">
                               {/* Logo */}
                               <Link href="/" className="flex items-center">
-                                    <div className="text-2xl font-bold text-primary-600">
-                                          <span className="block">Diversified</span>
-                                          <span className="block text-lg">Psychological Services</span>
+                                    <div className="flex items-center gap-3">
+                                          <div className="rounded-lg border border-primary-100 bg-white p-1 shadow-sm">
+                                                <Image
+                                                      src="/branding/dps-logo-mark.png"
+                                                      alt="Diversified Psychological Services logo mark"
+                                                      width={34}
+                                                      height={58}
+                                                      className="h-12 w-auto"
+                                                      priority
+                                                />
+                                          </div>
+                                          <div className="text-2xl font-bold leading-tight text-primary-600">
+                                                <span className="block">Diversified</span>
+                                                <span className="block text-base md:text-lg">Psychological Services</span>
+                                          </div>
                                     </div>
                               </Link>
 
@@ -76,7 +89,7 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                               <button
                                     onClick={() => setIsOpen(!isOpen)}
                                     className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-                                    aria-expanded="false"
+                                    aria-expanded={isOpen}
                               >
                                     <span className="sr-only">Open main menu</span>
                                     {!isOpen ? (

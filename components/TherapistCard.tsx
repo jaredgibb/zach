@@ -20,10 +20,15 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
       const fullBioViewer = useMemo(() => createYooptaEditor(), []);
       const hasImage = Boolean(therapist.image_url) && !imageFailed;
       const richFullBio = normalizeTherapistBioContent(therapist.full_bio_rich);
+      const hasRichFullBio = Boolean(richFullBio && Object.keys(richFullBio).length > 0);
       const fallbackParagraphs = therapist.full_bio
             .split('\n\n')
             .map((paragraph) => paragraph.trim())
             .filter((paragraph) => paragraph.length > 0);
+      const hasAboutContent = hasRichFullBio || fallbackParagraphs.length > 0;
+      const hasShortBio = therapist.short_bio.trim().length > 0;
+      const hasTitle = therapist.title.trim().length > 0;
+      const firstName = therapist.name.trim().split(/\s+/)[0] || therapist.name;
 
       return (
             <>
@@ -49,9 +54,11 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
                         </div>
 
                         <h2 className="text-2xl font-bold text-gray-900">{therapist.name}</h2>
-                        <p className="text-primary-600 font-medium mb-2">{therapist.credentials}</p>
-                        <p className="text-gray-600 mb-3">{therapist.title}</p>
-                        <p className="text-gray-700 leading-relaxed mb-4">{therapist.short_bio}</p>
+                        {therapist.credentials.trim() && (
+                              <p className="text-primary-600 font-medium mb-2">{therapist.credentials}</p>
+                        )}
+                        {hasTitle && <p className="text-gray-600 mb-3">{therapist.title}</p>}
+                        {hasShortBio && <p className="text-gray-700 leading-relaxed mb-4">{therapist.short_bio}</p>}
 
                         {therapist.specialties && therapist.specialties.length > 0 && (
                               <div className="mb-4">
@@ -103,21 +110,26 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
                                     )}
                               </div>
 
-                              <div>
-                                    <p className="text-primary-600 font-medium mb-2">{therapist.credentials}</p>
-                                    <p className="text-xl text-gray-600 mb-6">{therapist.title}</p>
-                              </div>
+                              {(therapist.credentials.trim() || hasTitle) && (
+                                    <div>
+                                          {therapist.credentials.trim() && (
+                                                <p className="text-primary-600 font-medium mb-2">{therapist.credentials}</p>
+                                          )}
+                                          {hasTitle && <p className="text-xl text-gray-600 mb-6">{therapist.title}</p>}
+                                    </div>
+                              )}
 
-                              {therapist.short_bio && (
+                              {hasShortBio && (
                                     <div>
                                           <h3 className="text-xl font-bold text-gray-900 mb-3">Summary</h3>
                                           <p className="text-gray-700 leading-relaxed">{therapist.short_bio}</p>
                                     </div>
                               )}
 
-                              <div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4">About {therapist.name.split(' ')[0]}</h3>
-                                    {richFullBio ? (
+                              {hasAboutContent && (
+                                    <div>
+                                          <h3 className="text-xl font-bold text-gray-900 mb-4">About {firstName}</h3>
+                                          {hasRichFullBio ? (
                                           <YooptaEditor
                                                 editor={fullBioViewer}
                                                 plugins={therapistBioPlugins}
@@ -130,14 +142,15 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
                                                       paddingBottom: 0,
                                                 }}
                                           />
-                                    ) : (
-                                          fallbackParagraphs.map((paragraph, index) => (
-                                                <p key={index} className="text-gray-700 leading-relaxed mb-4">
-                                                      {paragraph}
-                                                </p>
-                                          ))
-                                    )}
-                              </div>
+                                          ) : (
+                                                fallbackParagraphs.map((paragraph, index) => (
+                                                      <p key={index} className="text-gray-700 leading-relaxed mb-4">
+                                                            {paragraph}
+                                                      </p>
+                                                ))
+                                          )}
+                                    </div>
+                              )}
 
                               {therapist.fun_fact && (
                                     <div className="bg-primary-50 border-l-4 border-primary-600 p-4">

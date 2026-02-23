@@ -13,6 +13,9 @@ export function ServiceCard({ service }: ServiceCardProps) {
       const [isModalOpen, setIsModalOpen] = useState(false);
       const [imageFailed, setImageFailed] = useState(false);
       const hasImage = Boolean(service.image_url) && !imageFailed;
+      const hasShortDescription = service.short_description.trim().length > 0;
+      const hasFullDescription = service.full_description.trim().length > 0;
+      const hasFeatures = Array.isArray(service.features) && service.features.length > 0;
 
       return (
             <>
@@ -43,9 +46,11 @@ export function ServiceCard({ service }: ServiceCardProps) {
                         </div>
 
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
-                        <p className="text-gray-700 leading-relaxed mb-4">{service.short_description}</p>
+                        {hasShortDescription && (
+                              <p className="text-gray-700 leading-relaxed mb-4">{service.short_description}</p>
+                        )}
 
-                        {service.features && service.features.length > 0 && (
+                        {hasFeatures && (
                               <div className="mb-4">
                                     <ul className="space-y-2">
                                           {service.features.slice(0, 2).map((feature, idx) => (
@@ -104,10 +109,12 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
                               <div>
                                     <h2 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h2>
-                                    <p className="text-gray-700 leading-relaxed mb-6">{service.full_description}</p>
+                                    {hasFullDescription && (
+                                          <p className="text-gray-700 leading-relaxed mb-6">{service.full_description}</p>
+                                    )}
                               </div>
 
-                              {service.features && service.features.length > 0 && (
+                              {hasFeatures && (
                                     <div>
                                           <h3 className="font-bold text-gray-900 mb-4">What's Included:</h3>
                                           <ul className="space-y-3">
