@@ -125,6 +125,36 @@ const PLACEHOLDER_SERVICES: Service[] = [
       },
 ];
 
+function looksLikeTestValue(value: string): boolean {
+      const normalized = value.trim().toLowerCase();
+      return (
+            normalized === '' ||
+            normalized === 'asdf' ||
+            normalized.includes('asdf') ||
+            normalized === 'test' ||
+            normalized === 'demo' ||
+            normalized === 'temp'
+      );
+}
+
+function isUsableTherapistForPublicDisplay(therapist: Therapist): boolean {
+      const name = therapist.name.trim();
+      if (name.length < 5 || looksLikeTestValue(name)) {
+            return false;
+      }
+
+      return true;
+}
+
+function isUsableServiceForPublicDisplay(service: Service): boolean {
+      const title = service.title.trim();
+      if (title.length < 4 || looksLikeTestValue(title)) {
+            return false;
+      }
+
+      return true;
+}
+
 export default function LegacyHomeFallback() {
       const { fetchTherapists } = useTherapists();
       const { fetchServices } = useServices();
@@ -150,8 +180,34 @@ export default function LegacyHomeFallback() {
             loadData();
       }, [fetchTherapists, fetchServices]);
 
-      const visibleTherapists = therapists.length > 0 ? therapists : PLACEHOLDER_THERAPISTS;
-      const visibleServices = services.length > 0 ? services : PLACEHOLDER_SERVICES;
+      const sanitizedTherapists = therapists
+            .filter(isUsableTherapistForPublicDisplay)
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name));
+      const visibleTherapists = sanitizedTherapists.length > 0
+            ? [
+                  ...sanitizedTherapists,
+                  ...PLACEHOLDER_THERAPISTS.filter(
+                        (placeholder) =>
+                              !sanitizedTherapists.some(
+                                    (therapist) => therapist.name.toLowerCase() === placeholder.name.toLowerCase()
+                              )
+                  ),
+            ]
+            : PLACEHOLDER_THERAPISTS;
+
+      const sanitizedServices = services.filter(isUsableServiceForPublicDisplay);
+      const visibleServices = sanitizedServices.length > 0
+            ? [
+                  ...sanitizedServices,
+                  ...PLACEHOLDER_SERVICES.filter(
+                        (placeholder) =>
+                              !sanitizedServices.some(
+                                    (service) => service.title.toLowerCase() === placeholder.title.toLowerCase()
+                              )
+                  ),
+            ]
+            : PLACEHOLDER_SERVICES;
 
       return (
             <div className="overflow-hidden">

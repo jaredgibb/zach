@@ -59,6 +59,27 @@ const PLACEHOLDER_THERAPISTS: Therapist[] = [
       },
 ];
 
+function looksLikeTestValue(value: string): boolean {
+      const normalized = value.trim().toLowerCase();
+      return (
+            normalized === '' ||
+            normalized === 'asdf' ||
+            normalized.includes('asdf') ||
+            normalized === 'test' ||
+            normalized === 'demo' ||
+            normalized === 'temp'
+      );
+}
+
+function isUsableTherapistForPublicDisplay(therapist: Therapist): boolean {
+      const name = therapist.name.trim();
+      if (name.length < 5 || looksLikeTestValue(name)) {
+            return false;
+      }
+
+      return true;
+}
+
 export default function TherapistsPage() {
       const { fetchTherapists } = useTherapists();
       const [therapists, setTherapists] = useState<Therapist[]>([]);
@@ -100,7 +121,21 @@ export default function TherapistsPage() {
             );
       }
 
-      const visibleTherapists = therapists.length > 0 ? therapists : PLACEHOLDER_THERAPISTS;
+      const sanitizedTherapists = therapists
+            .filter(isUsableTherapistForPublicDisplay)
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name));
+      const visibleTherapists = sanitizedTherapists.length > 0
+            ? [
+                  ...sanitizedTherapists,
+                  ...PLACEHOLDER_THERAPISTS.filter(
+                        (placeholder) =>
+                              !sanitizedTherapists.some(
+                                    (therapist) => therapist.name.toLowerCase() === placeholder.name.toLowerCase()
+                              )
+                  ),
+            ]
+            : PLACEHOLDER_THERAPISTS;
 
       return (
             <div className="py-16">

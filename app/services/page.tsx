@@ -51,6 +51,27 @@ const PLACEHOLDER_SERVICES: Service[] = [
       },
 ];
 
+function looksLikeTestValue(value: string): boolean {
+      const normalized = value.trim().toLowerCase();
+      return (
+            normalized === '' ||
+            normalized === 'asdf' ||
+            normalized.includes('asdf') ||
+            normalized === 'test' ||
+            normalized === 'demo' ||
+            normalized === 'temp'
+      );
+}
+
+function isUsableServiceForPublicDisplay(service: Service): boolean {
+      const title = service.title.trim();
+      if (title.length < 4 || looksLikeTestValue(title)) {
+            return false;
+      }
+
+      return true;
+}
+
 export default function ServicesPage() {
       const { fetchServices } = useServices();
       const [services, setServices] = useState<Service[]>([]);
@@ -92,7 +113,18 @@ export default function ServicesPage() {
             );
       }
 
-      const visibleServices = services.length > 0 ? services : PLACEHOLDER_SERVICES;
+      const sanitizedServices = services.filter(isUsableServiceForPublicDisplay);
+      const visibleServices = sanitizedServices.length > 0
+            ? [
+                  ...sanitizedServices,
+                  ...PLACEHOLDER_SERVICES.filter(
+                        (placeholder) =>
+                              !sanitizedServices.some(
+                                    (service) => service.title.toLowerCase() === placeholder.title.toLowerCase()
+                              )
+                  ),
+            ]
+            : PLACEHOLDER_SERVICES;
 
       return (
             <div className="py-16">
