@@ -134,7 +134,7 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
                                                 editor={fullBioViewer}
                                                 plugins={therapistBioPlugins}
                                                 marks={therapistBioMarks}
-                                                value={richFullBio}
+                                                value={richFullBio ?? undefined}
                                                 readOnly
                                                 autoFocus={false}
                                                 style={{
