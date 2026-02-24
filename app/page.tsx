@@ -3,7 +3,7 @@ import CmsPageRenderer from '@/components/cms/CmsPageRenderer';
 import LegacyHomeFallback from '@/components/home/LegacyHomeFallback';
 import { buildJsonLdSchemas, buildSiteUrl, getPublicSnapshot, getPublishedHomePage } from '@/lib/cms/server';
 import type { CmsBlock } from '@/lib/cms/types';
-import { businessInfo } from '@/lib/data';
+import { buildHomeLocalBusinessSchema, enhanceCmsHomePage } from '@/lib/cms/homeEnhancements';
 
 const FALLBACK_TITLE = 'Diversified Psychological Services | Therapy in Kalamazoo, MI';
 const FALLBACK_DESCRIPTION =
@@ -53,28 +53,6 @@ function getFallbackDescription(blocks: CmsBlock[]): string {
       return FALLBACK_DESCRIPTION;
 }
 
-function buildFallbackLocalBusinessSchema() {
-      return {
-            '@context': 'https://schema.org',
-            '@type': 'LocalBusiness',
-            '@id': buildSiteUrl('/#local-business'),
-            name: businessInfo.name,
-            url: buildSiteUrl('/'),
-            telephone: businessInfo.phone,
-            email: businessInfo.email,
-            description: FALLBACK_DESCRIPTION,
-            areaServed: ['Kalamazoo, MI'],
-            address: {
-                  '@type': 'PostalAddress',
-                  streetAddress: businessInfo.address,
-                  addressLocality: businessInfo.city,
-                  addressRegion: businessInfo.state,
-                  postalCode: businessInfo.zip,
-                  addressCountry: 'US',
-            },
-      };
-}
-
 export async function generateMetadata(): Promise<Metadata> {
       const page = await getPublishedHomePage();
       if (!page || !page.published) {
@@ -84,7 +62,8 @@ export async function generateMetadata(): Promise<Metadata> {
             };
       }
 
-      const snapshot = getPublicSnapshot(page);
+      const enhancedPage = enhanceCmsHomePage(page);
+      const snapshot = getPublicSnapshot(enhancedPage);
       const title = snapshot.seo.metaTitle || snapshot.title || FALLBACK_TITLE;
       const description = snapshot.seo.metaDescription || getFallbackDescription(snapshot.blocks);
       const canonicalPath = snapshot.seo.canonicalPath || '/';
@@ -125,7 +104,7 @@ export default async function HomePage() {
       const page = await getPublishedHomePage();
 
       if (!page || !page.published) {
-            const fallbackLocalBusinessSchema = buildFallbackLocalBusinessSchema();
+            const fallbackLocalBusinessSchema = buildHomeLocalBusinessSchema(FALLBACK_DESCRIPTION);
 
             return (
                   <>
@@ -140,7 +119,10 @@ export default async function HomePage() {
             );
       }
 
-      const schemas = buildJsonLdSchemas(page);
+      const enhancedPage = enhanceCmsHomePage(page);
+      const snapshot = getPublicSnapshot(enhancedPage);
+      const description = snapshot.seo.metaDescription || getFallbackDescription(snapshot.blocks) || FALLBACK_DESCRIPTION;
+      const schemas = [...buildJsonLdSchemas(enhancedPage), buildHomeLocalBusinessSchema(description)];
 
-      return <CmsPageRenderer page={page} includeSchemas jsonLdSchemas={schemas} />;
+      return <CmsPageRenderer page={enhancedPage} includeSchemas jsonLdSchemas={schemas} />;
 }

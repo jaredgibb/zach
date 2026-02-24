@@ -9,10 +9,10 @@ import { useTherapists, useServices } from '@/lib/hooks/useDatabase';
 import type { Therapist, Service } from '@/lib/hooks/useDatabase';
 
 const STOCK_THERAPY_IMAGES = {
-      hero: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=2000&q=80',
+      hero: '/images/stock-therapy/hero.jpg',
       team: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1400&q=80',
       services: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80',
-      wellbeing: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=1400&q=80',
+      wellbeing: '/images/stock-therapy/stock-g-2.png',
 };
 
 const PLACEHOLDER_THERAPIST_IMAGES = [
@@ -625,7 +625,7 @@ export default function LegacyHomeFallback() {
                                     <div className="relative h-96 overflow-hidden rounded-2xl shadow-lg">
                                           <img
                                                 src={STOCK_THERAPY_IMAGES.wellbeing}
-                                                alt="African American woman resting in a calm, sunlit room"
+                                                alt="African American therapist meeting with an African American couple in a calm, sunlit office"
                                                 className="h-full w-full object-cover"
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/45 via-slate-900/10 to-transparent" />

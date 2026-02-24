@@ -2,6 +2,9 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { HomeServiceCard, type HomeServicePreview } from '@/components/home/HomeServiceCard';
+import { HomeTherapistCard, type HomeTherapistPreview } from '@/components/home/HomeTherapistCard';
+import { useServices, useTherapists } from '@/lib/hooks/useDatabase';
 import type {
       CmsBlock,
       CmsCtaBandBlock,
@@ -20,6 +23,7 @@ import type {
       CmsTrustBarBlock,
       CmsVideoEmbedBlock,
 } from '@/lib/cms/types';
+import type { Service, Therapist } from '@/lib/hooks/useDatabase';
 
 interface CmsPageRendererProps {
       page: CmsPage;
@@ -48,6 +52,79 @@ function renderHrefLink(href: string, children: React.ReactNode, className?: str
       );
 }
 
+function parseTeamMemberBio(bio: string): { specialty: string | null; body: string } {
+      const trimmed = bio.trim();
+      if (!trimmed) {
+            return { specialty: null, body: '' };
+      }
+
+      const match = trimmed.match(/^(?:focus|specialty)\s*:\s*([^.\n]+)[.\n]?\s*(.*)$/i);
+      if (!match) {
+            return { specialty: null, body: trimmed };
+      }
+
+      const specialty = match[1]?.trim() || null;
+      const body = match[2]?.trim() || '';
+      return { specialty, body };
+}
+
+const HOME_THERAPIST_IMAGE_FALLBACK =
+      'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=900&q=80';
+const HOME_THERAPIST_SPECIALTY_FALLBACK = 'General Mental Health Support';
+
+function looksLikeTestValue(value: string): boolean {
+      const normalized = value.trim().toLowerCase();
+      return (
+            normalized === '' ||
+            normalized === 'asdf' ||
+            normalized.includes('asdf') ||
+            normalized === 'test' ||
+            normalized === 'demo' ||
+            normalized === 'temp'
+      );
+}
+
+function isUsableTherapistForPublicDisplay(therapist: Therapist): boolean {
+      const name = therapist.name.trim();
+      return !(name.length < 5 || looksLikeTestValue(name));
+}
+
+function isUsableServiceForPublicDisplay(service: Service): boolean {
+      const title = service.title.trim();
+      return !(title.length < 4 || looksLikeTestValue(title));
+}
+
+function buildHomeTherapistPreviewsFromCms(therapists: Therapist[]): HomeTherapistPreview[] {
+      return therapists.slice(0, 3).map((therapist) => {
+            const specialty =
+                  therapist.specialties.find((item) => item.trim() && !looksLikeTestValue(item))?.trim() ??
+                  HOME_THERAPIST_SPECIALTY_FALLBACK;
+            const imageUrl = therapist.image_url?.trim() || HOME_THERAPIST_IMAGE_FALLBACK;
+            const hasPortrait = Boolean(therapist.image_url?.trim());
+
+            return {
+                  imageUrl,
+                  imageAlt: hasPortrait
+                        ? `Portrait of ${therapist.name}`
+                        : 'Comfortable therapy office in Kalamazoo with natural light',
+                  name: therapist.name,
+                  credentials: therapist.credentials || therapist.title || '',
+                  specialty,
+                  href: '/therapists',
+            };
+      });
+}
+
+function buildHomeServicePreviewsFromCms(services: Service[]): HomeServicePreview[] {
+      return services.slice(0, 6).map((service) => ({
+            title: service.title,
+            description:
+                  service.short_description.trim() ||
+                  'Compassionate, evidence-informed support tailored to your goals and stage of life.',
+            href: '/services',
+      }));
+}
+
 function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
       const alignmentClass = block.data.alignment === 'center' ? 'text-center' : 'text-left';
       const alignItemsClass = block.data.alignment === 'center' ? 'mx-auto items-center' : 'items-start';
@@ -57,9 +134,15 @@ function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
                   ? 'surface-warm text-slate-900'
                   : block.data.theme === 'dark'
                         ? 'bg-slate-900 text-slate-100'
-                        : 'bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500 text-white';
+                        : 'bg-gradient-to-br from-teal-800 via-emerald-700 to-teal-600 text-white';
       const isDarkTheme = block.data.theme === 'dark' || block.data.theme === 'primary';
       const overlayOpacity = Math.min(0.95, Math.max(0, Number.isFinite(block.data.overlayOpacity) ? block.data.overlayOpacity : 0.55));
+      const darkPrimaryButtonClass =
+            'inline-flex items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900';
+      const darkSecondaryButtonClass =
+            'inline-flex items-center justify-center rounded-lg border border-white/70 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900';
+      const lightPrimaryButtonClass = 'btn-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2';
+      const lightSecondaryButtonClass = 'btn-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2';
 
       return (
             <section className={`relative overflow-hidden py-20 md:py-28 ${themeClass}`}>
@@ -74,6 +157,7 @@ function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
                                     className={block.data.theme === 'light' ? 'absolute inset-0 bg-white' : 'absolute inset-0 bg-slate-950'}
                                     style={{ opacity: overlayOpacity }}
                               />
+                              {block.data.theme !== 'light' && <div className="absolute inset-0 bg-gradient-to-br from-slate-950/70 via-slate-900/40 to-emerald-950/35" />}
                               {block.data.theme === 'light' && (
                                     <div
                                           className="absolute inset-0 bg-gradient-to-r from-white to-white/60"
@@ -84,7 +168,7 @@ function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
                   )}
                   <div className="pointer-events-none absolute inset-0">
                         <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
-                        <div className="absolute -bottom-20 left-0 h-72 w-72 rounded-full bg-primary-300/20 blur-3xl" />
+                        <div className="absolute -bottom-20 left-0 h-72 w-72 rounded-full bg-emerald-300/15 blur-3xl" />
                   </div>
 
                   <div className="container-custom relative z-10">
@@ -95,15 +179,25 @@ function HeroBlockSection({ block }: { block: CmsHeroBlock }) {
                                     </p>
                                     <h1 className="text-4xl leading-tight md:text-6xl">{block.data.headline}</h1>
                                     {block.data.subheadline && (
-                                          <p className={`max-w-3xl text-lg leading-relaxed md:text-2xl ${isDarkTheme ? 'text-primary-50' : 'text-slate-700'}`}>
+                                          <p className={`max-w-3xl text-lg leading-relaxed md:text-2xl ${isDarkTheme ? 'text-slate-100' : 'text-slate-700'}`}>
                                                 {block.data.subheadline}
                                           </p>
                                     )}
                               </div>
 
                               <div className={`flex flex-wrap gap-4 ${block.data.alignment === 'center' ? 'justify-center' : 'justify-start'}`}>
-                                    {block.data.ctaPrimary && renderHrefLink(block.data.ctaPrimary.href, block.data.ctaPrimary.label, 'btn-primary')}
-                                    {block.data.ctaSecondary && renderHrefLink(block.data.ctaSecondary.href, block.data.ctaSecondary.label, 'btn-secondary')}
+                                    {block.data.ctaPrimary &&
+                                          renderHrefLink(
+                                                block.data.ctaPrimary.href,
+                                                block.data.ctaPrimary.label,
+                                                isDarkTheme ? darkPrimaryButtonClass : lightPrimaryButtonClass
+                                          )}
+                                    {block.data.ctaSecondary &&
+                                          renderHrefLink(
+                                                block.data.ctaSecondary.href,
+                                                block.data.ctaSecondary.label,
+                                                isDarkTheme ? darkSecondaryButtonClass : lightSecondaryButtonClass
+                                          )}
                               </div>
                         </div>
                   </div>
@@ -124,7 +218,7 @@ function TrustBarSection({ block }: { block: CmsTrustBarBlock }) {
                         <div className="grid gap-4 md:grid-cols-3">
                               {items.map((item, index) => (
                                     <article key={`${block.id}-${index}`} className="rounded-2xl border border-teal-100 bg-white p-5 shadow-sm">
-                                          <p className="text-base font-semibold text-primary-700">{item.label}</p>
+                                          <p className="text-base font-semibold text-emerald-700">{item.label}</p>
                                           {item.description && <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>}
                                     </article>
                               ))}
@@ -148,7 +242,7 @@ function ProcessStepsSection({ block }: { block: CmsProcessStepsBlock }) {
                         <div className="grid gap-5 md:grid-cols-3">
                               {steps.map((step, index) => (
                                     <article key={`${block.id}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
+                                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700">
                                                 {index + 1}
                                           </span>
                                           <h3 className="mt-4 text-xl text-slate-900">{step.title}</h3>
@@ -177,7 +271,10 @@ function InsuranceStripSection({ block }: { block: CmsInsuranceStripBlock }) {
                                           {block.data.intro && <p className="mt-3 text-base leading-relaxed text-slate-600">{block.data.intro}</p>}
                                           <div className="mt-5 flex flex-wrap gap-2">
                                                 {providers.map((provider) => (
-                                                      <span key={`${block.id}-${provider}`} className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700">
+                                                      <span
+                                                            key={`${block.id}-${provider}`}
+                                                            className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700"
+                                                      >
                                                             {provider}
                                                       </span>
                                                 ))}
@@ -186,9 +283,13 @@ function InsuranceStripSection({ block }: { block: CmsInsuranceStripBlock }) {
                                     </div>
                                     <div className="rounded-2xl bg-slate-900 p-6 text-white">
                                           <p className="text-sm uppercase tracking-[0.18em] text-teal-200">Ready to begin?</p>
-                                          <p className="mt-2 text-lg leading-relaxed text-slate-100">Request an appointment and our team will follow up with scheduling options.</p>
+                                          <p className="mt-2 text-lg leading-relaxed text-slate-100">Request a consultation and our team will follow up with scheduling options.</p>
                                           <div className="mt-5">
-                                                {renderHrefLink(block.data.ctaHref, block.data.ctaLabel, 'btn-secondary inline-block bg-white text-primary-700')}
+                                                {renderHrefLink(
+                                                      block.data.ctaHref,
+                                                      block.data.ctaLabel,
+                                                      'inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 font-semibold text-emerald-700 transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+                                                )}
                                           </div>
                                     </div>
                               </div>
@@ -272,7 +373,7 @@ function CtaBandSection({ block }: { block: CmsCtaBandBlock }) {
                   ? 'bg-white text-slate-900 border border-slate-200'
                   : block.data.style === 'dark'
                         ? 'bg-slate-900 text-white'
-                        : 'bg-gradient-to-r from-primary-700 to-primary-500 text-white';
+                        : 'bg-gradient-to-r from-teal-800 to-emerald-700 text-white';
 
       return (
             <section className="py-16 md:py-20">
@@ -281,7 +382,13 @@ function CtaBandSection({ block }: { block: CmsCtaBandBlock }) {
                               <h2 className="text-3xl md:text-4xl">{block.data.heading}</h2>
                               {block.data.body && <p className="mx-auto mt-4 max-w-3xl text-lg opacity-90">{block.data.body}</p>}
                               <div className="mt-8">
-                                    {renderHrefLink(block.data.buttonHref, block.data.buttonLabel, block.data.style === 'light' ? 'btn-primary inline-block' : 'btn-secondary inline-block bg-white text-primary-700')}
+                                    {renderHrefLink(
+                                          block.data.buttonHref,
+                                          block.data.buttonLabel,
+                                          block.data.style === 'light'
+                                                ? 'btn-primary inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2'
+                                                : 'inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 font-semibold text-emerald-700 transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+                                    )}
                               </div>
                         </div>
                   </div>
@@ -289,8 +396,65 @@ function CtaBandSection({ block }: { block: CmsCtaBandBlock }) {
       );
 }
 
-function CmsLinksSection({ block }: { block: CmsLinksBlock }) {
-      const items = block.data.items.filter((item) => item.label.trim() && item.href.trim());
+function CmsLinksSection({ block, isHomePage = false }: { block: CmsLinksBlock; isHomePage?: boolean }) {
+      const baseItems = block.data.items.filter((item) => item.label.trim() && item.href.trim());
+      const isServicesSection =
+            block.data.title.toLowerCase().includes('service') || baseItems.some((item) => item.href.trim() === '/services') || block.id === 'dps-home-services-grid';
+      const ctaLabel = isServicesSection ? 'Learn more' : 'Open page';
+      const { fetchServices, loading: servicesLoading } = useServices();
+      const [cmsServices, setCmsServices] = useState<Service[]>([]);
+
+      useEffect(() => {
+            if (!isHomePage || !isServicesSection) {
+                  return;
+            }
+
+            let cancelled = false;
+            async function loadServices() {
+                  const data = await fetchServices();
+                  if (!cancelled) {
+                        setCmsServices(data);
+                  }
+            }
+
+            loadServices();
+
+            return () => {
+                  cancelled = true;
+            };
+      }, [fetchServices, isHomePage, isServicesSection]);
+
+      const cmsServiceCards = buildHomeServicePreviewsFromCms(cmsServices.filter(isUsableServiceForPublicDisplay));
+      const items = baseItems;
+
+      if (isHomePage && isServicesSection && cmsServiceCards.length > 0) {
+            return (
+                  <section className="py-14">
+                        <div className="container-custom max-w-6xl">
+                              {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
+                              {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
+                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                    {cmsServiceCards.map((service) => (
+                                          <HomeServiceCard key={`${block.id}-${service.title}`} service={service} />
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+            );
+      }
+
+      if (isHomePage && isServicesSection && servicesLoading && cmsServiceCards.length === 0) {
+            return (
+                  <section className="py-14">
+                        <div className="container-custom max-w-6xl">
+                              {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
+                              {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
+                              <p className="text-sm text-slate-500">Loading services...</p>
+                        </div>
+                  </section>
+            );
+      }
+
       if (items.length === 0) {
             return null;
       }
@@ -303,12 +467,21 @@ function CmsLinksSection({ block }: { block: CmsLinksBlock }) {
 
                         <div className={block.data.layout === 'grid' ? 'grid gap-4 md:grid-cols-2' : 'space-y-3'}>
                               {items.map((item, index) => (
-                                    <div key={`${block.id}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                                          {renderHrefLink(
-                                                item.href,
-                                                <span className="text-lg font-semibold text-primary-700 hover:underline">{item.label}</span>
-                                          )}
+                                    <div
+                                          key={`${block.id}-${index}`}
+                                          className={`rounded-2xl border bg-white p-5 shadow-sm ${
+                                                block.data.layout === 'grid' && isServicesSection ? 'border-emerald-100' : 'border-slate-200'
+                                          }`}
+                                    >
+                                          <p className={`text-lg font-semibold ${isServicesSection ? 'text-slate-900' : 'text-primary-700'}`}>{item.label}</p>
                                           {item.description && <p className="mt-2 text-sm text-slate-600">{item.description}</p>}
+                                          <div className="mt-4">
+                                                {renderHrefLink(
+                                                      item.href,
+                                                      ctaLabel,
+                                                      'inline-flex items-center text-sm font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2'
+                                                )}
+                                          </div>
                                     </div>
                               ))}
                         </div>
@@ -540,8 +713,61 @@ function VideoEmbedSection({ block }: { block: CmsVideoEmbedBlock }) {
       );
 }
 
-function TeamGridSection({ block }: { block: CmsTeamGridBlock }) {
+function TeamGridSection({ block, isHomePage = false }: { block: CmsTeamGridBlock; isHomePage?: boolean }) {
       const members = block.data.members.filter((member) => member.name.trim());
+      const { fetchTherapists, loading: therapistsLoading } = useTherapists();
+      const [cmsTherapists, setCmsTherapists] = useState<Therapist[]>([]);
+
+      useEffect(() => {
+            if (!isHomePage) {
+                  return;
+            }
+
+            let cancelled = false;
+            async function loadTherapists() {
+                  const data = await fetchTherapists();
+                  if (!cancelled) {
+                        setCmsTherapists(data);
+                  }
+            }
+
+            loadTherapists();
+
+            return () => {
+                  cancelled = true;
+            };
+      }, [fetchTherapists, isHomePage]);
+
+      const cmsTherapistCards = buildHomeTherapistPreviewsFromCms(cmsTherapists.filter(isUsableTherapistForPublicDisplay));
+
+      if (isHomePage && cmsTherapistCards.length > 0) {
+            return (
+                  <section className="py-16">
+                        <div className="container-custom max-w-6xl">
+                              {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
+                              {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
+                              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                                    {cmsTherapistCards.map((therapist) => (
+                                          <HomeTherapistCard key={`${block.id}-${therapist.name}`} therapist={therapist} />
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+            );
+      }
+
+      if (isHomePage && therapistsLoading && cmsTherapistCards.length === 0) {
+            return (
+                  <section className="py-16">
+                        <div className="container-custom max-w-6xl">
+                              {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
+                              {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
+                              <p className="text-sm text-slate-500">Loading therapists...</p>
+                        </div>
+                  </section>
+            );
+      }
+
       if (members.length === 0) {
             return null;
       }
@@ -555,8 +781,11 @@ function TeamGridSection({ block }: { block: CmsTeamGridBlock }) {
                         {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
                         {block.data.intro && <p className="mb-8 text-slate-600">{block.data.intro}</p>}
                         <div className={`grid gap-5 ${columnsClass}`}>
-                              {members.map((member, index) => (
-                                    <article key={`${block.id}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                              {members.map((member, index) => {
+                                    const parsedBio = parseTeamMemberBio(member.bio || '');
+
+                                    return (
+                                          <article key={`${block.id}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                                           {member.imageUrl && (
                                                 <img
                                                       src={member.imageUrl}
@@ -564,24 +793,30 @@ function TeamGridSection({ block }: { block: CmsTeamGridBlock }) {
                                                       className="mb-4 h-52 w-full rounded-xl object-cover"
                                                 />
                                           )}
+                                          {parsedBio.specialty ? (
+                                                      <p className="mb-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
+                                                            {parsedBio.specialty}
+                                                      </p>
+                                          ) : null}
                                           <h3 className="text-lg font-semibold text-slate-900">{member.name}</h3>
-                                          {member.role && <p className="mt-1 text-sm text-primary-700">{member.role}</p>}
-                                          {member.bio && <p className="mt-3 text-sm text-slate-600">{member.bio}</p>}
+                                          {member.role && <p className="mt-1 text-sm text-emerald-700">{member.role}</p>}
+                                          {parsedBio.body ? <p className="mt-3 text-sm text-slate-600">{parsedBio.body}</p> : null}
                                           {member.profileHref &&
                                                 renderHrefLink(
                                                       member.profileHref,
-                                                      'View profile',
-                                                      'mt-4 inline-block text-sm font-medium text-primary-700 hover:underline'
+                                                      'View Profile',
+                                                      'mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2'
                                                 )}
-                                    </article>
-                              ))}
+                                          </article>
+                                    );
+                              })}
                         </div>
                   </div>
             </section>
       );
 }
 
-function renderBlock(block: CmsBlock) {
+function renderBlock(block: CmsBlock, context: { isHomePage: boolean }) {
       if (!block.visible) {
             return null;
       }
@@ -604,7 +839,7 @@ function renderBlock(block: CmsBlock) {
             case 'cta_band':
                   return <CtaBandSection block={block} />;
             case 'cms_links':
-                  return <CmsLinksSection block={block} />;
+                  return <CmsLinksSection block={block} isHomePage={context.isHomePage} />;
             case 'image_carousel':
                   return <ImageCarouselSection block={block} />;
             case 'testimonials':
@@ -614,7 +849,7 @@ function renderBlock(block: CmsBlock) {
             case 'video_embed':
                   return <VideoEmbedSection block={block} />;
             case 'team_grid':
-                  return <TeamGridSection block={block} />;
+                  return <TeamGridSection block={block} isHomePage={context.isHomePage} />;
             default:
                   return null;
       }
@@ -627,11 +862,12 @@ export default function CmsPageRenderer({
       jsonLdSchemas = [],
 }: CmsPageRendererProps) {
       const snapshot = useDraft || !page.published ? page.draft : page.published;
+      const isHomePage = page.path === '/' || page.slug === 'home';
 
       return (
             <>
                   {snapshot.blocks.map((block) => (
-                        <div key={block.id}>{renderBlock(block)}</div>
+                        <div key={block.id}>{renderBlock(block, { isHomePage })}</div>
                   ))}
 
                   {includeSchemas &&
