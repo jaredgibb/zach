@@ -3,6 +3,7 @@ import CmsPageRenderer from '@/components/cms/CmsPageRenderer';
 import LegacyHomeFallback from '@/components/home/LegacyHomeFallback';
 import { buildJsonLdSchemas, buildSiteUrl, getPublicSnapshot, getPublishedHomePage } from '@/lib/cms/server';
 import type { CmsBlock } from '@/lib/cms/types';
+import { businessInfo } from '@/lib/data';
 
 const FALLBACK_TITLE = 'Diversified Psychological Services | Therapy in Kalamazoo, MI';
 const FALLBACK_DESCRIPTION =
@@ -50,6 +51,28 @@ function getFallbackDescription(blocks: CmsBlock[]): string {
       }
 
       return FALLBACK_DESCRIPTION;
+}
+
+function buildFallbackLocalBusinessSchema() {
+      return {
+            '@context': 'https://schema.org',
+            '@type': 'LocalBusiness',
+            '@id': buildSiteUrl('/#local-business'),
+            name: businessInfo.name,
+            url: buildSiteUrl('/'),
+            telephone: businessInfo.phone,
+            email: businessInfo.email,
+            description: FALLBACK_DESCRIPTION,
+            areaServed: ['Kalamazoo, MI'],
+            address: {
+                  '@type': 'PostalAddress',
+                  streetAddress: businessInfo.address,
+                  addressLocality: businessInfo.city,
+                  addressRegion: businessInfo.state,
+                  postalCode: businessInfo.zip,
+                  addressCountry: 'US',
+            },
+      };
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -102,7 +125,19 @@ export default async function HomePage() {
       const page = await getPublishedHomePage();
 
       if (!page || !page.published) {
-            return <LegacyHomeFallback />;
+            const fallbackLocalBusinessSchema = buildFallbackLocalBusinessSchema();
+
+            return (
+                  <>
+                        <LegacyHomeFallback />
+                        <script
+                              type="application/ld+json"
+                              dangerouslySetInnerHTML={{
+                                    __html: JSON.stringify(fallbackLocalBusinessSchema),
+                              }}
+                        />
+                  </>
+            );
       }
 
       const schemas = buildJsonLdSchemas(page);

@@ -2,63 +2,100 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { insuranceProviders } from '@/lib/data';
+import { HomeServiceCard, type HomeServicePreview } from '@/components/home/HomeServiceCard';
+import { HomeTherapistCard, type HomeTherapistPreview } from '@/components/home/HomeTherapistCard';
 import { useTherapists, useServices } from '@/lib/hooks/useDatabase';
 import type { Therapist, Service } from '@/lib/hooks/useDatabase';
 
 const STOCK_THERAPY_IMAGES = {
-      hero: 'https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?auto=format&fit=crop&w=1800&q=80',
-      team: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80',
-      services: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=1400&q=80',
-      wellbeing: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
+      hero: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=2000&q=80',
+      team: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1400&q=80',
+      services: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80',
+      wellbeing: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=1400&q=80',
+};
+
+const PLACEHOLDER_THERAPIST_IMAGES = [
+      'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&q=80',
+];
+
+const HOME_THERAPIST_SPECIALTY_FALLBACK = 'General Mental Health Support';
+const HOME_THERAPIST_FALLBACK_PROFILE_HREF = '/therapists';
+const HOME_SERVICE_HREF = '/services';
+
+const CURATED_HOME_SERVICE_TITLES = [
+      'Anxiety & Depression',
+      'Couples Counseling',
+      'Trauma-Informed Care',
+      'Child & Adolescent Therapy',
+      'ADHD & Neurodivergence Support',
+      'Life Transitions & Stress Management',
+];
+
+const SERVICE_DESCRIPTION_FALLBACKS: Record<string, string> = {
+      'Anxiety & Depression':
+            'Supportive, evidence-based care to help you manage stress, mood changes, and everyday overwhelm.',
+      'Couples Counseling':
+            'Strengthen communication, rebuild trust, and work through conflict with a compassionate therapist.',
+      'Trauma-Informed Care':
+            'Gentle, paced therapy that prioritizes safety, empowerment, and healing after difficult experiences.',
+      'Child & Adolescent Therapy':
+            'Age-appropriate counseling for emotional regulation, school stress, behavior concerns, and family changes.',
+      'ADHD & Neurodivergence Support':
+            'Practical tools and affirming care tailored to executive functioning, attention needs, and burnout.',
+      'Life Transitions & Stress Management':
+            'Therapy for career shifts, grief, caregiving stress, and major life changes with steady guidance.',
 };
 
 const PLACEHOLDER_THERAPISTS: Therapist[] = [
       {
-            id: 'placeholder-alex-carter',
-            name: 'Alex Carter',
+            id: 'placeholder-maya-robinson',
+            name: 'Maya Robinson',
             credentials: 'MA, LPC',
-            title: '',
-            short_bio: '',
+            title: 'Licensed Professional Counselor',
+            short_bio: 'Warm, collaborative therapy for focus challenges, burnout, and life transitions.',
             full_bio: '',
             full_bio_rich: null,
             fun_fact: null,
-            specialties: [],
-            image_url: null,
-            slug: 'alex-carter',
+            specialties: ['ADHD & Neurodivergence'],
+            image_url: PLACEHOLDER_THERAPIST_IMAGES[0],
+            slug: 'maya-robinson',
             order_index: 0,
             is_active: true,
             created_at: '',
             updated_at: '',
       },
       {
-            id: 'placeholder-jordan-lee',
-            name: 'Jordan Lee',
+            id: 'placeholder-darius-bennett',
+            name: 'Darius Bennett',
             credentials: 'MSW, LMSW',
-            title: '',
-            short_bio: '',
+            title: 'Licensed Master Social Worker',
+            short_bio: 'Client-centered care for anxiety, depression, and relationship stress with practical tools.',
             full_bio: '',
             full_bio_rich: null,
             fun_fact: null,
-            specialties: [],
-            image_url: null,
-            slug: 'jordan-lee',
+            specialties: ['Anxiety & Depression'],
+            image_url: PLACEHOLDER_THERAPIST_IMAGES[1],
+            slug: 'darius-bennett',
             order_index: 1,
             is_active: true,
             created_at: '',
             updated_at: '',
       },
       {
-            id: 'placeholder-taylor-morgan',
-            name: 'Taylor Morgan',
+            id: 'placeholder-imani-brooks',
+            name: 'Imani Brooks',
             credentials: 'PhD, LP',
-            title: '',
-            short_bio: '',
+            title: 'Licensed Psychologist',
+            short_bio: 'Trauma-focused, strengths-based therapy designed to help clients feel safe and supported.',
             full_bio: '',
             full_bio_rich: null,
             fun_fact: null,
-            specialties: [],
-            image_url: null,
-            slug: 'taylor-morgan',
+            specialties: ['Trauma Recovery'],
+            image_url: PLACEHOLDER_THERAPIST_IMAGES[2],
+            slug: 'imani-brooks',
             order_index: 2,
             is_active: true,
             created_at: '',
@@ -68,10 +105,10 @@ const PLACEHOLDER_THERAPISTS: Therapist[] = [
 
 const PLACEHOLDER_SERVICES: Service[] = [
       {
-            id: 'placeholder-individual-therapy',
-            title: 'Individual Therapy',
-            slug: 'individual-therapy',
-            short_description: '',
+            id: 'placeholder-anxiety-depression',
+            title: 'Anxiety & Depression',
+            slug: 'anxiety-depression',
+            short_description: SERVICE_DESCRIPTION_FALLBACKS['Anxiety & Depression'],
             full_description: '',
             full_description_rich: null,
             image_url: null,
@@ -85,7 +122,7 @@ const PLACEHOLDER_SERVICES: Service[] = [
             id: 'placeholder-couples-counseling',
             title: 'Couples Counseling',
             slug: 'couples-counseling',
-            short_description: '',
+            short_description: SERVICE_DESCRIPTION_FALLBACKS['Couples Counseling'],
             full_description: '',
             full_description_rich: null,
             image_url: null,
@@ -96,10 +133,10 @@ const PLACEHOLDER_SERVICES: Service[] = [
             updated_at: '',
       },
       {
-            id: 'placeholder-family-therapy',
-            title: 'Family Therapy',
-            slug: 'family-therapy',
-            short_description: '',
+            id: 'placeholder-trauma-informed-care',
+            title: 'Trauma-Informed Care',
+            slug: 'trauma-informed-care',
+            short_description: SERVICE_DESCRIPTION_FALLBACKS['Trauma-Informed Care'],
             full_description: '',
             full_description_rich: null,
             image_url: null,
@@ -110,15 +147,43 @@ const PLACEHOLDER_SERVICES: Service[] = [
             updated_at: '',
       },
       {
-            id: 'placeholder-telehealth',
-            title: 'Telehealth Sessions',
-            slug: 'telehealth-sessions',
-            short_description: '',
+            id: 'placeholder-child-adolescent-therapy',
+            title: 'Child & Adolescent Therapy',
+            slug: 'child-adolescent-therapy',
+            short_description: SERVICE_DESCRIPTION_FALLBACKS['Child & Adolescent Therapy'],
             full_description: '',
             full_description_rich: null,
             image_url: null,
             features: [],
             order_index: 3,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-adhd-neurodivergence-support',
+            title: 'ADHD & Neurodivergence Support',
+            slug: 'adhd-neurodivergence-support',
+            short_description: SERVICE_DESCRIPTION_FALLBACKS['ADHD & Neurodivergence Support'],
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 4,
+            is_active: true,
+            created_at: '',
+            updated_at: '',
+      },
+      {
+            id: 'placeholder-life-transitions-stress',
+            title: 'Life Transitions & Stress Management',
+            slug: 'life-transitions-stress-management',
+            short_description: SERVICE_DESCRIPTION_FALLBACKS['Life Transitions & Stress Management'],
+            full_description: '',
+            full_description_rich: null,
+            image_url: null,
+            features: [],
+            order_index: 5,
             is_active: true,
             created_at: '',
             updated_at: '',
@@ -153,6 +218,50 @@ function isUsableServiceForPublicDisplay(service: Service): boolean {
       }
 
       return true;
+}
+
+function normalizeLookupValue(value: string): string {
+      return value.trim().toLowerCase();
+}
+
+function getHomeTherapistSpecialty(therapist: Therapist): string {
+      return (
+            therapist.specialties.find((specialty) => specialty.trim() && !looksLikeTestValue(specialty))?.trim() ??
+            HOME_THERAPIST_SPECIALTY_FALLBACK
+      );
+}
+
+function buildHomeTherapistPreviews(therapists: Therapist[]): HomeTherapistPreview[] {
+      return therapists.slice(0, 3).map((therapist, index) => ({
+            imageUrl:
+                  therapist.image_url?.trim() ||
+                  PLACEHOLDER_THERAPIST_IMAGES[index % PLACEHOLDER_THERAPIST_IMAGES.length],
+            imageAlt: `Portrait of ${therapist.name}`,
+            name: therapist.name,
+            credentials: therapist.credentials.trim() || 'Licensed Therapist',
+            specialty: getHomeTherapistSpecialty(therapist),
+            href: HOME_THERAPIST_FALLBACK_PROFILE_HREF,
+      }));
+}
+
+function buildHomeServicePreviews(services: Service[]): HomeServicePreview[] {
+      const serviceLookup = new Map(
+            services.map((service) => [normalizeLookupValue(service.title), service] as const)
+      );
+
+      return CURATED_HOME_SERVICE_TITLES.map((title) => {
+            const matchedService = serviceLookup.get(normalizeLookupValue(title));
+            const description =
+                  matchedService?.short_description.trim() ||
+                  SERVICE_DESCRIPTION_FALLBACKS[title] ||
+                  'Compassionate care tailored to your needs.';
+
+            return {
+                  title,
+                  description,
+                  href: HOME_SERVICE_HREF,
+            };
+      });
 }
 
 export default function LegacyHomeFallback() {
@@ -195,61 +304,90 @@ export default function LegacyHomeFallback() {
                   ),
             ]
             : PLACEHOLDER_THERAPISTS;
+      const visibleTherapistCards = buildHomeTherapistPreviews(visibleTherapists);
 
       const sanitizedServices = services.filter(isUsableServiceForPublicDisplay);
-      const visibleServices = sanitizedServices.length > 0
-            ? [
-                  ...sanitizedServices,
-                  ...PLACEHOLDER_SERVICES.filter(
-                        (placeholder) =>
-                              !sanitizedServices.some(
-                                    (service) => service.title.toLowerCase() === placeholder.title.toLowerCase()
-                              )
-                  ),
-            ]
-            : PLACEHOLDER_SERVICES;
+      const visibleServices = sanitizedServices.length > 0 ? sanitizedServices : PLACEHOLDER_SERVICES;
+      const visibleServiceCards = buildHomeServicePreviews(visibleServices);
 
       return (
             <div className="overflow-hidden">
                   {/* ===== SECTION 1: HERO ===== */}
-                  <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary-600 via-primary-550 to-primary-700 text-white overflow-hidden">
+                  <section className="relative overflow-hidden bg-slate-900 py-20 text-white md:py-32">
                         <div className="absolute inset-0">
                               <img
                                     src={STOCK_THERAPY_IMAGES.hero}
-                                    alt="Two people talking during a therapy session"
+                                    alt="Comfortable therapy office in Kalamazoo with soft natural light"
                                     className="h-full w-full object-cover"
                               />
-                              <div className="absolute inset-0 bg-slate-950/55"></div>
-                              <div className="absolute inset-0 bg-gradient-to-r from-primary-900/75 via-primary-700/55 to-primary-500/35"></div>
+                              <div className="absolute inset-0 bg-slate-950/60"></div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-teal-950/80 via-teal-900/55 to-emerald-700/25"></div>
                         </div>
                         {/* Decorative gradient orbs */}
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-32 -mt-32"></div>
-                        <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-32 mb-32"></div>
+                        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-teal-400 opacity-20 mix-blend-screen blur-3xl"></div>
+                        <div className="absolute bottom-0 -left-32 mb-32 h-96 w-96 rounded-full bg-emerald-400 opacity-15 mix-blend-screen blur-3xl"></div>
 
                         <div className="container-custom relative z-10">
                               <div className="max-w-3xl mx-auto text-center">
                                     <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
                                           Your Mental Health Matters
                                     </h1>
-                                    <p className="text-xl md:text-2xl text-primary-100 mb-4 font-light">
+                                    <p className="mb-4 text-xl font-light text-white/90 md:text-2xl">
                                           Expert therapy in a safe, welcoming environment
                                     </p>
-                                    <p className="text-lg text-primary-100 mb-10">
+                                    <p className="mb-10 text-lg text-white/85">
                                           Meet with experienced, licensed therapists who are dedicated to supporting your journey toward greater wellbeing.
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                           <Link
                                                 href="/contact"
-                                                className="inline-block bg-white text-primary-600 hover:bg-gray-50 font-semibold px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                                                className="inline-block rounded-lg bg-white px-8 py-4 font-semibold text-teal-800 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-teal-900"
                                           >
-                                                Schedule a Session
+                                                Request a Consultation
                                           </Link>
                                           <Link
                                                 href="/therapists"
-                                                className="inline-block bg-primary-700 text-white hover:bg-primary-800 font-semibold px-8 py-4 rounded-lg transition-all duration-300 border border-white/20"
+                                                className="inline-block rounded-lg border border-white/25 bg-white/10 px-8 py-4 font-semibold text-white transition-all duration-300 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-teal-900"
                                           >
                                                 Meet Our Team
                                           </Link>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
+                  {/* ===== SECTION 1.5: INSURANCE RIBBON ===== */}
+                  <section className="bg-stone-50 py-8 md:py-10">
+                        <div className="container-custom">
+                              <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm md:p-6">
+                                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                          <div className="max-w-2xl">
+                                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-800">
+                                                      Insurance Accepted
+                                                </p>
+                                                <h2 className="mt-2 text-xl font-bold text-gray-900 md:text-2xl">
+                                                      We work with many major insurance plans
+                                                </h2>
+                                                <p className="mt-2 text-sm text-gray-600 md:text-base">
+                                                      Contact us if you don&apos;t see your plan listed. We&apos;re happy to help verify coverage options.
+                                                </p>
+                                          </div>
+                                          <Link
+                                                href="/contact"
+                                                className="inline-flex shrink-0 items-center justify-center rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-800 transition hover:bg-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                                          >
+                                                Ask About Coverage
+                                          </Link>
+                                    </div>
+                                    <div className="mt-5 flex flex-wrap gap-2">
+                                          {insuranceProviders.map((provider) => (
+                                                <span
+                                                      key={provider}
+                                                      className="rounded-full border border-teal-100 bg-teal-50/70 px-3 py-1.5 text-sm font-medium text-teal-900"
+                                                >
+                                                      {provider}
+                                                </span>
+                                          ))}
                                     </div>
                               </div>
                         </div>
@@ -300,7 +438,7 @@ export default function LegacyHomeFallback() {
                                     ].map((benefit, idx) => (
                                           <div key={idx} className="group p-8 bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200">
                                                 <div className="text-5xl mb-4">{benefit.icon}</div>
-                                                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                                                <h3 className="text-xl font-bold text-gray-900 mb-3 transition-colors group-hover:text-teal-700">
                                                       {benefit.title}
                                                 </h3>
                                                 <p className="text-gray-600 leading-relaxed">
@@ -318,8 +456,8 @@ export default function LegacyHomeFallback() {
                               <div className="text-center mb-16">
                                     <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
                                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                                          {!isLoading && visibleTherapists.length > 0
-                                                ? `${visibleTherapists.length} experienced professionals ready to help`
+                                          {!isLoading && visibleTherapistCards.length > 0
+                                                ? `${visibleTherapistCards.length} experienced professionals ready to help`
                                                 : 'Experienced professionals ready to help you'
                                           }
                                     </p>
@@ -327,7 +465,7 @@ export default function LegacyHomeFallback() {
 
                               <div className="mb-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-center rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                                     <div>
-                                          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700 mb-2">
+                                          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">
                                                 Compassionate, Person-Centered Care
                                           </p>
                                           <p className="text-lg text-gray-700 leading-relaxed">
@@ -337,7 +475,7 @@ export default function LegacyHomeFallback() {
                                     <div className="relative h-60 overflow-hidden rounded-xl bg-gray-100">
                                           <img
                                                 src={STOCK_THERAPY_IMAGES.team}
-                                                alt="A therapist speaking with a client in a comfortable office"
+                                                alt="Warm therapy office seating area with natural light"
                                                 className="h-full w-full object-cover"
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
@@ -345,44 +483,15 @@ export default function LegacyHomeFallback() {
                               </div>
 
                               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                                    {visibleTherapists.slice(0, 3).map((therapist) => (
-                                          <div key={therapist.id} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
-                                                {therapist.image_url ? (
-                                                      <img
-                                                            src={therapist.image_url}
-                                                            alt={`Photo of ${therapist.name}`}
-                                                            className="h-64 w-full object-cover"
-                                                      />
-                                                ) : (
-                                                      <div className="h-64 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-                                                            <svg className="w-32 h-32 text-primary-300" fill="currentColor" viewBox="0 0 24 24">
-                                                                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                                            </svg>
-                                                      </div>
-                                                )}
-                                                <div className="p-6 bg-white">
-                                                      <h3 className="text-xl font-bold text-gray-900">{therapist.name}</h3>
-                                                      {therapist.credentials.trim() && (
-                                                            <p className="text-primary-600 font-semibold text-sm mb-1">{therapist.credentials}</p>
-                                                      )}
-                                                      {therapist.title.trim() && (
-                                                            <p className="text-gray-600 text-sm mb-3">{therapist.title}</p>
-                                                      )}
-                                                      {therapist.short_bio.trim() && (
-                                                            <p className="text-gray-700 text-sm leading-relaxed line-clamp-2">{therapist.short_bio}</p>
-                                                      )}
-                                                      <Link href="/therapists" className="inline-block mt-4 text-primary-600 font-semibold hover:underline">
-                                                            View profile →
-                                                      </Link>
-                                                </div>
-                                          </div>
+                                    {visibleTherapistCards.map((therapist) => (
+                                          <HomeTherapistCard key={`${therapist.name}-${therapist.specialty}`} therapist={therapist} />
                                     ))}
                               </div>
 
                               <div className="text-center">
                                     <Link
                                           href="/therapists"
-                                          className="inline-block bg-primary-600 text-white hover:bg-primary-700 font-semibold px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105"
+                                          className="inline-block rounded-lg bg-teal-700 px-8 py-4 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
                                     >
                                           View All Therapists
                                     </Link>
@@ -403,48 +512,27 @@ export default function LegacyHomeFallback() {
                               <div className="mb-10 relative overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
                                     <img
                                           src={STOCK_THERAPY_IMAGES.services}
-                                          alt="Therapist and client talking in a counseling session"
+                                          alt="Calm counseling room with comfortable chairs and natural light"
                                           className="h-56 w-full object-cover md:h-72"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-r from-slate-950/65 via-slate-900/35 to-transparent" />
                                     <div className="absolute inset-y-0 left-0 flex max-w-xl items-center p-6 md:p-8">
                                           <p className="text-base md:text-lg leading-relaxed text-white">
-                                                Service descriptions can be expanded over time while the current layout continues to provide a clear, easy-to-navigate overview.
+                                                Start with the areas you need support in most. We&apos;ll help you find the right therapist and next step.
                                           </p>
                                     </div>
                               </div>
 
-                              <div className="grid md:grid-cols-2 gap-8">
-                                    {visibleServices.slice(0, 4).map((service) => (
-                                          <div key={service.id} className="group p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary-300">
-                                                <div className="flex items-start">
-                                                      <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary-200 transition-colors">
-                                                            <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                            </svg>
-                                                      </div>
-                                                      <div className="flex-1">
-                                                            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                                                                  {service.title}
-                                                            </h3>
-                                                            {service.short_description.trim() && (
-                                                                  <p className="text-gray-600 mb-4 line-clamp-2">
-                                                                        {service.short_description}
-                                                                  </p>
-                                                            )}
-                                                            <Link href="/services" className="text-primary-600 font-semibold text-sm hover:underline">
-                                                                  Learn more →
-                                                            </Link>
-                                                      </div>
-                                                </div>
-                                          </div>
+                              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {visibleServiceCards.map((service) => (
+                                          <HomeServiceCard key={service.title} service={service} />
                                     ))}
                               </div>
 
                               <div className="text-center mt-12">
                                     <Link
                                           href="/services"
-                                          className="inline-block bg-primary-600 text-white hover:bg-primary-700 font-semibold px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105"
+                                          className="inline-block rounded-lg bg-teal-700 px-8 py-4 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
                                     >
                                           Explore All Services
                                     </Link>
@@ -466,8 +554,8 @@ export default function LegacyHomeFallback() {
                                     {[
                                           {
                                                 step: '01',
-                                                title: 'Schedule',
-                                                description: 'Choose a time that works with your schedule'
+                                                title: 'Reach Out',
+                                                description: 'Request a consultation and share what support you are looking for'
                                           },
                                           {
                                                 step: '02',
@@ -487,14 +575,14 @@ export default function LegacyHomeFallback() {
                                     ].map((item, idx) => (
                                           <div key={idx} className="text-center">
                                                 <div className="mb-6">
-                                                      <span className="inline-block text-4xl font-bold text-primary-600 bg-primary-100 rounded-full w-16 h-16 flex items-center justify-center">
+                                                      <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-4xl font-bold text-teal-700">
                                                             {item.step}
                                                       </span>
                                                 </div>
                                                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
                                                 <p className="text-gray-600">{item.description}</p>
                                                 {idx < 3 && (
-                                                      <div className="hidden md:block absolute top-1/3 right-0 transform translate-x-1/2 text-primary-300">
+                                                      <div className="absolute right-0 top-1/3 hidden -translate-x-1/2 transform text-teal-200 md:block">
                                                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                                                   <path d="M9 5l7 7-7 7" />
                                                             </svg>
@@ -507,7 +595,7 @@ export default function LegacyHomeFallback() {
                   </section>
 
                   {/* ===== SECTION 6: WHY MENTAL HEALTH MATTERS ===== */}
-                  <section className="py-20 bg-gradient-to-r from-primary-50 to-blue-50">
+                  <section className="bg-gradient-to-r from-stone-50 to-teal-50/50 py-20">
                         <div className="container-custom">
                               <div className="grid md:grid-cols-2 gap-12 items-center">
                                     <div>
@@ -526,7 +614,7 @@ export default function LegacyHomeFallback() {
                                                       'Create lasting positive change'
                                                 ].map((item, idx) => (
                                                       <li key={idx} className="flex items-center text-gray-700">
-                                                            <svg className="w-6 h-6 text-primary-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                            <svg className="mr-3 h-6 w-6 flex-shrink-0 text-teal-700" fill="currentColor" viewBox="0 0 20 20">
                                                                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                             </svg>
                                                             {item}
@@ -537,12 +625,12 @@ export default function LegacyHomeFallback() {
                                     <div className="relative h-96 overflow-hidden rounded-2xl shadow-lg">
                                           <img
                                                 src={STOCK_THERAPY_IMAGES.wellbeing}
-                                                alt="Therapist and client meeting in a calm setting"
+                                                alt="African American woman resting in a calm, sunlit room"
                                                 className="h-full w-full object-cover"
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/45 via-slate-900/10 to-transparent" />
                                           <div className="absolute bottom-4 left-4 right-4 rounded-xl bg-white/90 p-4 backdrop-blur-sm">
-                                                <p className="text-sm font-semibold text-primary-700 mb-1">A welcoming place to start</p>
+                                                <p className="mb-1 text-sm font-semibold text-teal-800">A welcoming place to start</p>
                                                 <p className="text-sm text-gray-700">
                                                       Therapy can support everyday stress, life transitions, relationships, and long-term growth.
                                                 </p>
@@ -553,27 +641,27 @@ export default function LegacyHomeFallback() {
                   </section>
 
                   {/* ===== SECTION 7: CTA - READY TO START ===== */}
-                  <section className="py-20 md:py-28 bg-gradient-to-r from-primary-600 to-primary-700 text-white relative overflow-hidden">
+                  <section className="relative overflow-hidden bg-gradient-to-r from-teal-800 to-emerald-800 py-20 text-white md:py-28">
                         {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-48 -mt-48"></div>
-                        <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-48 mb-48"></div>
+                        <div className="absolute -right-48 -top-48 h-96 w-96 rounded-full bg-teal-400 opacity-20 mix-blend-screen blur-3xl"></div>
+                        <div className="absolute bottom-0 -left-48 mb-48 h-96 w-96 rounded-full bg-emerald-300 opacity-15 mix-blend-screen blur-3xl"></div>
 
                         <div className="container-custom relative z-10">
                               <div className="max-w-3xl mx-auto text-center">
                                     <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Take the Next Step?</h2>
-                                    <p className="text-xl text-primary-100 mb-10 leading-relaxed">
+                                    <p className="mb-10 text-xl leading-relaxed text-white/90">
                                           Start your journey toward better mental health today. With flexible scheduling and compassionate care, we're here to support you.
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                           <Link
                                                 href="/contact"
-                                                className="inline-block bg-white text-primary-600 hover:bg-gray-50 font-semibold px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                                                className="inline-block rounded-lg bg-white px-8 py-4 font-semibold text-teal-800 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-teal-900"
                                           >
-                                                Schedule Today
+                                                Start Your Journey
                                           </Link>
                                           <Link
                                                 href="/about"
-                                                className="inline-block bg-primary-700 text-white hover:bg-primary-800 font-semibold px-8 py-4 rounded-lg transition-all duration-300 border border-white/20"
+                                                className="inline-block rounded-lg border border-white/25 bg-white/10 px-8 py-4 font-semibold text-white transition-all duration-300 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-teal-900"
                                           >
                                                 Learn More
                                           </Link>
