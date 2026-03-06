@@ -38,7 +38,7 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                           </div>
                                     </div>
                                     <p className="text-sm mb-4">
-                                          {businessInfo.aboutShort}
+                                          Compassionate, evidence-informed therapy in Kalamazoo with in-person and telehealth care options.
                                     </p>
                                     <div className="space-y-2 text-sm">
                                           <p>{businessInfo.address}</p>
@@ -66,15 +66,10 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                                       {insurance}
                                                 </li>
                                           ))}
-                                          <li className="flex items-start">
-                                                <span className="text-primary-300 mr-2">•</span>
-                                                More to come
-                                          </li>
-                                          <li className="flex items-start font-medium text-primary-300">
-                                                <span className="mr-2">•</span>
-                                                Ask if we accept your insurance!
-                                          </li>
                                     </ul>
+                                    <p className="mt-4 text-sm text-slate-400">
+                                          Ask about current insurance participation if you do not see your plan listed.
+                                    </p>
                               </div>
 
                               {/* Right Column - CTA */}
@@ -84,7 +79,7 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                                           href="/contact"
                                           className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors mb-6"
                                     >
-                                          Request Appointment
+                                          Contact the Practice
                                     </Link>
 
                                     <div className="mt-8">

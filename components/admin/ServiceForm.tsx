@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import slugify from 'slugify';
 import { useServices, type Service } from '@/lib/hooks/useDatabase';
 import { uploadAdminImage } from '@/lib/uploadAdminImage';
+import { getPublicServiceValidationErrors } from '@/lib/publicContent';
 
 interface ServiceFormProps {
       serviceId?: string | null;
@@ -162,6 +163,13 @@ export default function ServiceForm({
                         order_index: Number.isFinite(parsedOrderIndex) ? parsedOrderIndex : nextOrderIndex,
                         is_active: formData.is_active ?? true,
                   };
+
+                  if (payload.is_active) {
+                        const validationErrors = getPublicServiceValidationErrors(payload);
+                        if (validationErrors.length > 0) {
+                              throw new Error(validationErrors.join(' '));
+                        }
+                  }
 
                   if (serviceId) {
                         await updateService(serviceId, payload);
@@ -374,6 +382,9 @@ export default function ServiceForm({
                               <option value="true">Active</option>
                               <option value="false">Inactive</option>
                         </select>
+                        <p className="mt-2 text-xs text-gray-500">
+                              Active services appear on the public site and require a meaningful short description plus fuller detail or feature bullets.
+                        </p>
                   </div>
 
                   <button

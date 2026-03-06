@@ -31,6 +31,10 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
             { name: 'Client Portal', href: businessInfo.clientPortalUrl, external: true },
       ];
 
+      function isActivePath(href: string): boolean {
+            return pathname === href || pathname.startsWith(`${href}/`);
+      }
+
       return (
             <header className="bg-white/95 shadow-md sticky top-0 z-50 backdrop-blur">
                   <nav className="container-custom py-4">
@@ -73,7 +77,12 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                                                       <Link
                                                             key={item.name}
                                                             href={item.href}
-                                                            className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                                            aria-current={isActivePath(item.href) ? 'page' : undefined}
+                                                            className={`font-medium transition-colors ${
+                                                                  isActivePath(item.href)
+                                                                        ? 'text-primary-700'
+                                                                        : 'text-gray-700 hover:text-primary-600'
+                                                            }`}
                                                       >
                                                             {item.name}
                                                       </Link>
@@ -129,7 +138,12 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                                                 <Link
                                                       key={item.name}
                                                       href={item.href}
-                                                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50"
+                                                      aria-current={isActivePath(item.href) ? 'page' : undefined}
+                                                      className={`block rounded-md px-3 py-2 text-base font-medium ${
+                                                            isActivePath(item.href)
+                                                                  ? 'bg-primary-50 text-primary-700'
+                                                                  : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
+                                                      }`}
                                                       onClick={() => setIsOpen(false)}
                                                 >
                                                       {item.name}

@@ -11,6 +11,7 @@ import {
       getTherapistBioPlainText,
       normalizeTherapistBioContent,
 } from '@/lib/yooptaTherapistBio';
+import { getPublicTherapistValidationErrors } from '@/lib/publicContent';
 
 interface TherapistFormProps {
       therapistId?: string | null;
@@ -204,6 +205,13 @@ export default function TherapistForm({
                         order_index: Number.isFinite(parsedOrderIndex) ? parsedOrderIndex : nextOrderIndex,
                         is_active: formData.is_active ?? true,
                   };
+
+                  if (payload.is_active) {
+                        const validationErrors = getPublicTherapistValidationErrors(payload);
+                        if (validationErrors.length > 0) {
+                              throw new Error(validationErrors.join(' '));
+                        }
+                  }
 
                   if (therapistId) {
                         await updateTherapist(therapistId, payload);
@@ -424,6 +432,9 @@ export default function TherapistForm({
                               <option value="true">Active</option>
                               <option value="false">Inactive</option>
                         </select>
+                        <p className="mt-2 text-xs text-gray-500">
+                              Active therapist profiles appear on the public site and require a title, short bio, fuller biography, and at least one specialty.
+                        </p>
                   </div>
 
                   <button

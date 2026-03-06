@@ -1,345 +1,157 @@
-'use client';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import StructuredData from '@/components/StructuredData';
+import { buildSiteUrl } from '@/lib/cms/server';
+import { businessInfo, insuranceProviders } from '@/lib/data';
+import {
+      buildBreadcrumbSchema,
+      buildPracticeLocalBusinessSchema,
+} from '@/lib/publicContentServer';
 
-import { useState } from 'react';
-import { businessInfo, insuranceProviders, therapists } from '@/lib/data';
+const PAGE_TITLE = 'Contact Diversified Psychological Services | Kalamazoo, MI';
+const PAGE_DESCRIPTION =
+      'Contact Diversified Psychological Services in Kalamazoo, Michigan by phone or email to ask about therapist availability, insurance, and next steps for getting started.';
+const PAGE_URL = buildSiteUrl('/contact');
+
+export const metadata: Metadata = {
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      alternates: {
+            canonical: PAGE_URL,
+      },
+      openGraph: {
+            title: PAGE_TITLE,
+            description: PAGE_DESCRIPTION,
+            url: PAGE_URL,
+      },
+      twitter: {
+            card: 'summary',
+            title: PAGE_TITLE,
+            description: PAGE_DESCRIPTION,
+      },
+};
 
 export default function ContactPage() {
-      const [isMinor, setIsMinor] = useState(false);
-      const [formData, setFormData] = useState({
-            firstName: '',
-            lastName: '',
-            phone: '',
-            email: '',
-            city: '',
-            state: '',
-            zip: '',
-            age: '',
-            insurance: '',
-            otherInsurance: '',
-            requestedTherapist: '',
-      });
-
-      const [isSubmitting, setIsSubmitting] = useState(false);
-      const [submitMessage, setSubmitMessage] = useState('');
-
-      const ageRangesMinor = ['0-5', '6-10', '11-13', '14-17'];
-      const ageRangesAdult = ['18-21', '22-40', '41-65', '65+'];
-
-      const handleSubmit = async (e: React.FormEvent) => {
-            e.preventDefault();
-            setIsSubmitting(true);
-            setSubmitMessage('');
-
-            // Simulate form submission
-            setTimeout(() => {
-                  setSubmitMessage('Thank you for contacting us! We will reach out to you within 1-2 business days.');
-                  setIsSubmitting(false);
-                  setFormData({
-                        firstName: '',
-                        lastName: '',
-                        phone: '',
-                        email: '',
-                        city: '',
-                        state: '',
-                        zip: '',
-                        age: '',
-                        insurance: '',
-                        otherInsurance: '',
-                        requestedTherapist: '',
-                  });
-                  setIsMinor(false);
-            }, 1000);
-      };
-
-      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-            const { name, value } = e.target;
-            setFormData({ ...formData, [name]: value });
-      };
+      const schemas = [
+            buildPracticeLocalBusinessSchema(PAGE_DESCRIPTION),
+            buildBreadcrumbSchema([
+                  { name: 'Home', path: '/' },
+                  { name: 'Contact', path: '/contact' },
+            ]),
+      ];
 
       return (
-            <div className="py-16">
-                  <div className="container-custom">
-                        <div className="max-w-3xl mx-auto">
-                              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
-                                    Contact Us
-                              </h1>
-
-                              {/* Business Info */}
-                              <div className="bg-primary-50 rounded-lg p-6 mb-8">
-                                    <h2 className="text-2xl font-bold text-primary-900 mb-4">
-                                          {businessInfo.name}
-                                    </h2>
-                                    <div className="space-y-2 text-gray-700">
-                                          <p>
-                                                <strong>Address:</strong><br />
-                                                {businessInfo.address}<br />
-                                                {businessInfo.city}, {businessInfo.state} {businessInfo.zip}
-                                          </p>
-                                          <p>
-                                                <strong>Phone:</strong>{' '}
-                                                <a href={`tel:${businessInfo.phone}`} className="text-primary-600 hover:underline">
-                                                      {businessInfo.phone}
-                                                </a>
-                                          </p>
-                                          <p>
-                                                <strong>Email:</strong>{' '}
-                                                <a href={`mailto:${businessInfo.email}`} className="text-primary-600 hover:underline">
-                                                      {businessInfo.email}
-                                                </a>
-                                          </p>
-                                    </div>
-                              </div>
-
-                              {/* Emergency Notice */}
-                              <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-8">
-                                    <h3 className="text-lg font-bold text-red-900 mb-3">
-                                          This form is not intended for emergency services
-                                    </h3>
-                                    <p className="text-red-800 mb-2">
-                                          If you are experiencing a mental health emergency:
+            <>
+                  <div className="surface-warm py-16 md:py-20">
+                        <div className="container-custom max-w-6xl">
+                              <div className="max-w-4xl">
+                                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">
+                                          Contact our Kalamazoo office
                                     </p>
-                                    <ul className="list-disc list-inside text-red-800 space-y-1">
-                                          <li>Dial <strong>988</strong> for the National Suicide and Crisis Lifeline</li>
-                                          <li>Dial <strong>911</strong> for Emergency Services or Go to the Nearest Emergency Room</li>
-                                    </ul>
-                              </div>
-
-                              {/* Contact Form */}
-                              <div className="bg-white rounded-lg shadow-md p-8">
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                                          Request an Appointment
-                                    </h2>
-
-                                    {submitMessage && (
-                                          <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
-                                                {submitMessage}
-                                          </div>
-                                    )}
-
-                                    <form onSubmit={handleSubmit} className="space-y-6">
-                                          {/* Name Fields */}
-                                          <div className="grid md:grid-cols-2 gap-6">
-                                                <div>
-                                                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                                                            First Name <span className="text-red-500">*</span>
-                                                      </label>
-                                                      <input
-                                                            type="text"
-                                                            id="firstName"
-                                                            name="firstName"
-                                                            required
-                                                            value={formData.firstName}
-                                                            onChange={handleChange}
-                                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                      />
-                                                </div>
-
-                                                <div>
-                                                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                                                            Last Name <span className="text-red-500">*</span>
-                                                      </label>
-                                                      <input
-                                                            type="text"
-                                                            id="lastName"
-                                                            name="lastName"
-                                                            required
-                                                            value={formData.lastName}
-                                                            onChange={handleChange}
-                                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                      />
-                                                </div>
-                                          </div>
-
-                                          {/* Contact Fields */}
-                                          <div className="grid md:grid-cols-2 gap-6">
-                                                <div>
-                                                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                                                            Phone Number <span className="text-red-500">*</span>
-                                                      </label>
-                                                      <input
-                                                            type="tel"
-                                                            id="phone"
-                                                            name="phone"
-                                                            required
-                                                            value={formData.phone}
-                                                            onChange={handleChange}
-                                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                      />
-                                                </div>
-
-                                                <div>
-                                                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                                                            Email <span className="text-red-500">*</span>
-                                                      </label>
-                                                      <input
-                                                            type="email"
-                                                            id="email"
-                                                            name="email"
-                                                            required
-                                                            value={formData.email}
-                                                            onChange={handleChange}
-                                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                      />
-                                                </div>
-                                          </div>
-
-                                          {/* Address Fields */}
-                                          <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                      Address <span className="text-red-500">*</span>
-                                                </label>
-                                                <div className="grid md:grid-cols-3 gap-4">
-                                                      <div className="md:col-span-2">
-                                                            <input
-                                                                  type="text"
-                                                                  id="city"
-                                                                  name="city"
-                                                                  placeholder="City"
-                                                                  required
-                                                                  value={formData.city}
-                                                                  onChange={handleChange}
-                                                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                            />
-                                                      </div>
-                                                      <div className="grid grid-cols-2 gap-4">
-                                                            <input
-                                                                  type="text"
-                                                                  id="state"
-                                                                  name="state"
-                                                                  placeholder="State"
-                                                                  required
-                                                                  maxLength={2}
-                                                                  value={formData.state}
-                                                                  onChange={handleChange}
-                                                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                            />
-                                                            <input
-                                                                  type="text"
-                                                                  id="zip"
-                                                                  name="zip"
-                                                                  placeholder="Zip"
-                                                                  required
-                                                                  maxLength={10}
-                                                                  value={formData.zip}
-                                                                  onChange={handleChange}
-                                                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                            />
-                                                      </div>
-                                                </div>
-                                          </div>
-
-                                          {/* Minor Checkbox */}
-                                          <div className="bg-gray-50 p-4 rounded-lg">
-                                                <label className="flex items-start cursor-pointer">
-                                                      <input
-                                                            type="checkbox"
-                                                            checked={isMinor}
-                                                            onChange={(e) => {
-                                                                  setIsMinor(e.target.checked);
-                                                                  setFormData({ ...formData, age: '' });
-                                                            }}
-                                                            className="mt-1 mr-3 h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                                                      />
-                                                      <span className="text-sm text-gray-700">
-                                                            This form is intended to be completed by a parent or legal guardian. Minors should not complete this form on their own. Check here if you are the parent or legal guardian of a minor and are inquiring about services for them.
-                                                      </span>
-                                                </label>
-                                          </div>
-
-                                          {/* Age */}
-                                          <div>
-                                                <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">
-                                                      Age Range <span className="text-red-500">*</span>
-                                                </label>
-                                                <select
-                                                      id="age"
-                                                      name="age"
-                                                      required
-                                                      value={formData.age}
-                                                      onChange={handleChange}
-                                                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                >
-                                                      <option value="">Select age range</option>
-                                                      {(isMinor ? ageRangesMinor : ageRangesAdult).map((range) => (
-                                                            <option key={range} value={range}>
-                                                                  {range}
-                                                            </option>
-                                                      ))}
-                                                </select>
-                                          </div>
-
-                                          {/* Insurance */}
-                                          <div>
-                                                <label htmlFor="insurance" className="block text-sm font-medium text-gray-700 mb-2">
-                                                      Insurance/Payer Name <span className="text-red-500">*</span>
-                                                </label>
-                                                <select
-                                                      id="insurance"
-                                                      name="insurance"
-                                                      required
-                                                      value={formData.insurance}
-                                                      onChange={handleChange}
-                                                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                >
-                                                      <option value="">Select your insurance</option>
-                                                      {insuranceProviders.map((provider) => (
-                                                            <option key={provider} value={provider}>
-                                                                  {provider}
-                                                            </option>
-                                                      ))}
-                                                      <option value="other">Other</option>
-                                                </select>
-                                          </div>
-
-                                          {/* Other Insurance */}
-                                          {formData.insurance === 'other' && (
-                                                <div>
-                                                      <label htmlFor="otherInsurance" className="block text-sm font-medium text-gray-700 mb-2">
-                                                            Please specify your insurance
-                                                      </label>
-                                                      <input
-                                                            type="text"
-                                                            id="otherInsurance"
-                                                            name="otherInsurance"
-                                                            value={formData.otherInsurance}
-                                                            onChange={handleChange}
-                                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                      />
-                                                </div>
-                                          )}
-
-                                          {/* Therapist Request */}
-                                          <div>
-                                                <label htmlFor="requestedTherapist" className="block text-sm font-medium text-gray-700 mb-2">
-                                                      Therapist Requested (Optional)
-                                                </label>
-                                                <select
-                                                      id="requestedTherapist"
-                                                      name="requestedTherapist"
-                                                      value={formData.requestedTherapist}
-                                                      onChange={handleChange}
-                                                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                                >
-                                                      <option value="">No preference</option>
-                                                      {therapists.map((therapist) => (
-                                                            <option key={therapist.id} value={therapist.name}>
-                                                                  {therapist.name}, {therapist.credentials}
-                                                            </option>
-                                                      ))}
-                                                </select>
-                                          </div>
-
-                                          <button
-                                                type="submit"
-                                                disabled={isSubmitting}
-                                                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                                          >
-                                                {isSubmitting ? 'Sending...' : 'Send Message'}
-                                          </button>
-                                    </form>
+                                    <h1 className="mt-4 text-4xl text-slate-900 md:text-6xl">
+                                          Reach out to ask about appointments, insurance, and therapist fit
+                                    </h1>
+                                    <p className="mt-6 text-lg leading-relaxed text-slate-700 md:text-xl">
+                                          Call or email Diversified Psychological Services directly. We can help you understand current availability, which therapist may be a fit, and what to expect next.
+                                    </p>
                               </div>
                         </div>
                   </div>
-            </div>
+
+                  <div className="bg-white py-16">
+                        <div className="container-custom max-w-6xl">
+                              <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+                                    <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
+                                          <h2 className="text-2xl text-slate-900">Contact details</h2>
+                                          <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700">
+                                                <p>
+                                                      <strong className="text-slate-900">Phone:</strong>{' '}
+                                                      <a href={`tel:${businessInfo.phone}`} className="font-semibold text-teal-800 underline underline-offset-4">
+                                                            {businessInfo.phone}
+                                                      </a>
+                                                </p>
+                                                <p>
+                                                      <strong className="text-slate-900">Email:</strong>{' '}
+                                                      <a href={`mailto:${businessInfo.email}`} className="font-semibold text-teal-800 underline underline-offset-4">
+                                                            {businessInfo.email}
+                                                      </a>
+                                                </p>
+                                                <p>
+                                                      <strong className="text-slate-900">Office:</strong><br />
+                                                      {businessInfo.address}<br />
+                                                      {businessInfo.city}, {businessInfo.state} {businessInfo.zip}
+                                                </p>
+                                          </div>
+
+                                          <div className="mt-8 rounded-2xl bg-teal-50 p-5">
+                                                <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">
+                                                      Helpful to include when you reach out
+                                                </h3>
+                                                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
+                                                      <li>Your preferred days or times for appointments</li>
+                                                      <li>Your insurance plan or payer</li>
+                                                      <li>Whether you prefer in-person or telehealth care</li>
+                                                      <li>Any therapist preference or main reason you are seeking support</li>
+                                                </ul>
+                                          </div>
+                                    </section>
+
+                                    <section className="rounded-3xl border border-red-200 bg-red-50 p-8 shadow-sm">
+                                          <h2 className="text-2xl text-red-950">Emergency notice</h2>
+                                          <p className="mt-4 text-base leading-relaxed text-red-900">
+                                                This practice is not an emergency service. If you are experiencing a mental health crisis, do not wait for a callback from the office.
+                                          </p>
+                                          <ul className="mt-5 space-y-3 text-sm leading-relaxed text-red-900">
+                                                <li>Dial or text <strong>988</strong> for the Suicide and Crisis Lifeline.</li>
+                                                <li>Call <strong>911</strong> or go to the nearest emergency room if you are in immediate danger.</li>
+                                          </ul>
+                                    </section>
+                              </div>
+                        </div>
+                  </div>
+
+                  <section className="surface-mint py-16">
+                        <div className="container-custom max-w-6xl">
+                              <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+                                    <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
+                                          <h2 className="text-2xl text-slate-900">Insurance information</h2>
+                                          <p className="mt-4 text-base leading-relaxed text-slate-700">
+                                                We accept many major insurance plans. If you do not see your plan listed, reach out and we can help clarify current options.
+                                          </p>
+                                          <div className="mt-5 flex flex-wrap gap-2">
+                                                {insuranceProviders.map((provider) => (
+                                                      <span
+                                                            key={provider}
+                                                            className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700"
+                                                      >
+                                                            {provider}
+                                                      </span>
+                                                ))}
+                                          </div>
+                                    </section>
+
+                                    <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
+                                          <h2 className="text-2xl text-slate-900">Need more context first?</h2>
+                                          <p className="mt-4 text-base leading-relaxed text-slate-700">
+                                                Review our therapist profiles and services before you reach out if you want a clearer sense of fit.
+                                          </p>
+                                          <div className="mt-6 space-y-4">
+                                                <Link href="/therapists" className="block text-sm font-semibold text-teal-800 underline underline-offset-4">
+                                                      Meet our therapists
+                                                </Link>
+                                                <Link href="/services" className="block text-sm font-semibold text-teal-800 underline underline-offset-4">
+                                                      Explore services
+                                                </Link>
+                                                <Link href="/about" className="block text-sm font-semibold text-teal-800 underline underline-offset-4">
+                                                      Learn about the practice
+                                                </Link>
+                                          </div>
+                                    </section>
+                              </div>
+                        </div>
+                  </section>
+
+                  <StructuredData schemas={schemas} idPrefix="contact-page-schema" />
+            </>
       );
 }

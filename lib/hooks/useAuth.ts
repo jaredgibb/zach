@@ -27,8 +27,11 @@ export function useAuth() {
                         setLoading(false);
                   });
             } catch (err) {
-                  setError(err instanceof Error ? err.message : 'Failed to initialize auth');
-                  setLoading(false);
+                  const message = err instanceof Error ? err.message : 'Failed to initialize auth';
+                  queueMicrotask(() => {
+                        setError(message);
+                        setLoading(false);
+                  });
             }
 
             return () => {

@@ -1,84 +1,139 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import StructuredData from '@/components/StructuredData';
+import { buildSiteUrl } from '@/lib/cms/server';
+import {
+      buildBreadcrumbSchema,
+      buildPracticeLocalBusinessSchema,
+} from '@/lib/publicContentServer';
+
+const PAGE_TITLE = 'About Diversified Psychological Services | Kalamazoo, MI';
+const PAGE_DESCRIPTION =
+      'Learn about Diversified Psychological Services, a Kalamazoo therapy practice offering compassionate, evidence-informed care for individuals, couples, and families.';
+const PAGE_URL = buildSiteUrl('/about');
+
+export const metadata: Metadata = {
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      alternates: {
+            canonical: PAGE_URL,
+      },
+      openGraph: {
+            title: PAGE_TITLE,
+            description: PAGE_DESCRIPTION,
+            url: PAGE_URL,
+      },
+      twitter: {
+            card: 'summary',
+            title: PAGE_TITLE,
+            description: PAGE_DESCRIPTION,
+      },
+};
 
 export default function AboutPage() {
+      const schemas = [
+            buildPracticeLocalBusinessSchema(PAGE_DESCRIPTION),
+            buildBreadcrumbSchema([
+                  { name: 'Home', path: '/' },
+                  { name: 'About', path: '/about' },
+            ]),
+      ];
+
       return (
-            <div className="py-16">
-                  <div className="container-custom">
-                        <div className="max-w-4xl mx-auto">
-                              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-12 text-center">
-                                    About Us
-                              </h1>
-
-                              {/* Who We Are */}
-                              <section className="mb-12">
-                                    <h2 className="text-3xl font-bold text-primary-600 mb-6">Who We Are</h2>
-                                    <p className="text-lg text-gray-700 leading-relaxed">
-                                          Diversified Psychological Services exists to serve others. We seek to meet your needs where you are at through a safe and welcoming environment for all. We offer both in-person and online therapy sessions, allowing for flexibility and convenience. We understand that life can be hectic, so we aim to meet you where you are, whether that's in the office or via a secured online platform. We strongly believe in the client/therapist relationship and put emphasis on building a relationship/rapport with our clients. We see this relationship just like any other - each entity has to be willing to give a piece of themselves, and we hope our clients see us not only as their therapist, but also as someone who'll walk beside them in their journey.
+            <>
+                  <div className="surface-warm py-16 md:py-20">
+                        <div className="container-custom max-w-6xl">
+                              <div className="max-w-4xl">
+                                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">
+                                          About our practice
                                     </p>
-                              </section>
-
-                              {/* Why We Are Different */}
-                              <section className="mb-12 bg-gray-50 rounded-lg p-8">
-                                    <h2 className="text-3xl font-bold text-primary-600 mb-6">Why We Are Different</h2>
-                                    <div className="space-y-6">
-                                          <div>
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-3">Committed to the Process</h3>
-                                                <p className="text-lg text-gray-700 leading-relaxed">
-                                                      Our ideal clients are ones who are committed to change; ones who fall in love with the process. We often focus on the beginning and end of things, and downplay the middle as that is where the work is truly being done. We must learn to love the process. If committed to the process, change related to issues, needs, goals, etc will eventually be met, no matter how difficult.
-                                                </p>
-                                          </div>
-                                          <div>
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-3">Diversified Expertise</h3>
-                                                <p className="text-lg text-gray-700 leading-relaxed">
-                                                      As in our name, our therapists have a broad range of skillsets, education, and experience, allowing us to work with a diverse population of individuals and families ranging in age and intensity of needs.
-                                                </p>
-                                          </div>
-                                    </div>
-                              </section>
-
-                              {/* What We Do */}
-                              <section className="mb-12">
-                                    <h2 className="text-3xl font-bold text-primary-600 mb-6">What We Do</h2>
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                          <div className="bg-white border-2 border-primary-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Individual Therapy</h3>
-                                                <p className="text-gray-700">One-on-one sessions tailored to your personal needs and goals.</p>
-                                          </div>
-                                          <div className="bg-white border-2 border-primary-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Family Therapy</h3>
-                                                <p className="text-gray-700">Support for families working through challenges together.</p>
-                                          </div>
-                                          <div className="bg-white border-2 border-primary-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Couples Counseling</h3>
-                                                <p className="text-gray-700">Helping couples strengthen their relationships and communication.</p>
-                                          </div>
-                                          <div className="bg-white border-2 border-primary-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-2">EAP Services</h3>
-                                                <p className="text-gray-700">Employee Assistance Program services for workplace wellness.</p>
-                                          </div>
-                                    </div>
-                                    <div className="mt-8 text-center">
-                                          <Link href="/services" className="btn-primary inline-block">
-                                                Learn More About Our Services
-                                          </Link>
-                                    </div>
-                              </section>
-
-                              {/* CTA */}
-                              <div className="bg-primary-600 text-white rounded-lg p-8 text-center mt-12">
-                                    <h2 className="text-2xl font-bold mb-4">Ready to Begin Your Journey?</h2>
-                                    <p className="text-lg mb-6 text-primary-100">
-                                          Contact us today to schedule an appointment with one of our experienced therapists.
+                                    <h1 className="mt-4 text-4xl text-slate-900 md:text-6xl">
+                                          Therapy rooted in relationship, clarity, and practical support
+                                    </h1>
+                                    <p className="mt-6 text-lg leading-relaxed text-slate-700 md:text-xl">
+                                          Diversified Psychological Services exists to serve people through safe, welcoming, and evidence-informed therapy in Kalamazoo, Michigan.
                                     </p>
-                                    <Link
-                                          href="/contact"
-                                          className="inline-block bg-white text-primary-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-lg transition-colors"
-                                    >
-                                          Contact Us
-                                    </Link>
                               </div>
                         </div>
                   </div>
-            </div>
+
+                  <div className="bg-white py-16">
+                        <div className="container-custom max-w-5xl">
+                              <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+                                    <div className="space-y-8">
+                                          <section>
+                                                <h2 className="text-3xl text-slate-900">Who we are</h2>
+                                                <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
+                                                      We work with individuals, couples, and families across a wide range of concerns, including anxiety, depression, trauma, relationship stress, grief, parenting challenges, and major life transitions.
+                                                </p>
+                                                <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
+                                                      Our clinicians bring different backgrounds, specialties, and life experience to the work. What they share is a commitment to thoughtful care, clear communication, and a therapeutic relationship that feels steady and collaborative.
+                                                </p>
+                                          </section>
+
+                                          <section>
+                                                <h2 className="text-3xl text-slate-900">How we approach care</h2>
+                                                <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
+                                                      We believe therapy is most useful when it is grounded in both trust and practicality. That means listening carefully, understanding what is happening in your life right now, and helping you build tools that support lasting change.
+                                                </p>
+                                                <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
+                                                      We offer in-person appointments in Kalamazoo and telehealth options when appropriate, so care can fit more realistically into everyday life.
+                                                </p>
+                                          </section>
+                                    </div>
+
+                                    <aside className="rounded-3xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+                                          <h2 className="text-xl font-semibold text-slate-900">What makes this practice different</h2>
+                                          <ul className="mt-5 space-y-4 text-sm leading-relaxed text-slate-700">
+                                                <li>Relationship-based therapy that stays focused on real-life needs.</li>
+                                                <li>Support across different ages, concerns, and family situations.</li>
+                                                <li>Clear next steps for scheduling, insurance questions, and finding the right fit.</li>
+                                          </ul>
+                                          <div className="mt-6 rounded-2xl bg-white p-5">
+                                                <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">Next step</h3>
+                                                <p className="mt-3 text-sm text-slate-700">
+                                                      Start by reviewing our therapists or services, then contact the practice when you are ready.
+                                                </p>
+                                                <div className="mt-4 space-y-3">
+                                                      <Link href="/therapists" className="block text-sm font-semibold text-teal-800 underline underline-offset-4">
+                                                            Meet our therapists
+                                                      </Link>
+                                                      <Link href="/services" className="block text-sm font-semibold text-teal-800 underline underline-offset-4">
+                                                            Explore services
+                                                      </Link>
+                                                </div>
+                                          </div>
+                                    </aside>
+                              </div>
+                        </div>
+                  </div>
+
+                  <section className="surface-mint py-16">
+                        <div className="container-custom max-w-5xl">
+                              <div className="rounded-3xl bg-slate-900 px-8 py-12 text-center text-white shadow-md md:px-12">
+                                    <h2 className="text-3xl md:text-4xl">Ready to talk through next steps?</h2>
+                                    <p className="mx-auto mt-4 max-w-3xl text-lg text-slate-100">
+                                          Reach out to the office for help with therapist fit, insurance questions, and current appointment availability.
+                                    </p>
+                                    <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+                                          <Link
+                                                href="/contact"
+                                                className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                                          >
+                                                Contact the practice
+                                          </Link>
+                                          <Link
+                                                href="/therapists"
+                                                className="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/10 px-6 py-3 font-semibold text-white transition hover:bg-white/20"
+                                          >
+                                                Meet our therapists
+                                          </Link>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
+                  <StructuredData schemas={schemas} idPrefix="about-page-schema" />
+            </>
       );
 }

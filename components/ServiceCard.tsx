@@ -1,8 +1,5 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
-import { Modal } from '@/components/Modal';
+import { getMeaningfulList } from '@/lib/publicContent';
 import type { Service } from '@/lib/hooks/useDatabase';
 
 interface ServiceCardProps {
@@ -10,140 +7,43 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const [imageFailed, setImageFailed] = useState(false);
-      const hasImage = Boolean(service.image_url) && !imageFailed;
-      const hasShortDescription = service.short_description.trim().length > 0;
-      const hasFullDescription = service.full_description.trim().length > 0;
-      const hasFeatures = Array.isArray(service.features) && service.features.length > 0;
+      const featurePreview = getMeaningfulList(service.features).slice(0, 3);
+      const href = `/services/${service.slug}`;
 
       return (
-            <>
-                  <div
-                        onClick={() => setIsModalOpen(true)}
-                        className="card cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  >
-                        <div className="relative h-48 bg-gray-200 rounded-lg mb-4 overflow-hidden">
-                              {hasImage ? (
-                                    <img
-                                          src={service.image_url ?? ''}
-                                          alt={service.title}
-                                          className="h-full w-full object-cover"
-                                          onError={() => setImageFailed(true)}
-                                    />
-                              ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                          <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                      strokeLinecap="round"
-                                                      strokeLinejoin="round"
-                                                      strokeWidth={2}
-                                                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                                                />
-                                          </svg>
-                                    </div>
-                              )}
-                        </div>
+            <article className="group rounded-3xl border border-stone-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                  <Link href={href} className="block h-full">
+                        <div className="flex h-full flex-col p-6">
+                              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
+                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                              </div>
 
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
-                        {hasShortDescription && (
-                              <p className="text-gray-700 leading-relaxed mb-4">{service.short_description}</p>
-                        )}
+                              <div className="space-y-3">
+                                    <h2 className="text-2xl font-bold text-slate-900 transition-colors group-hover:text-teal-800">
+                                          {service.title}
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-700">{service.short_description}</p>
+                              </div>
 
-                        {hasFeatures && (
-                              <div className="mb-4">
-                                    <ul className="space-y-2">
-                                          {service.features.slice(0, 2).map((feature, idx) => (
-                                                <li key={idx} className="flex items-start text-sm text-gray-700">
-                                                      <span className="text-primary-600 mr-2">✓</span>
-                                                      {feature}
+                              {featurePreview.length > 0 && (
+                                    <ul className="mt-5 space-y-2 text-sm text-slate-700">
+                                          {featurePreview.map((feature) => (
+                                                <li key={feature} className="flex items-start gap-2">
+                                                      <span className="mt-0.5 text-teal-700">•</span>
+                                                      <span>{feature}</span>
                                                 </li>
                                           ))}
-                                          {service.features.length > 2 && (
-                                                <li className="text-sm text-primary-600 font-medium">
-                                                      + {service.features.length - 2} more features
-                                                </li>
-                                          )}
                                     </ul>
-                              </div>
-                        )}
-
-                        <button
-                              onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsModalOpen(true);
-                              }}
-                              className="text-primary-600 font-medium hover:underline"
-                        >
-                              Learn more →
-                        </button>
-                  </div>
-
-                  <Modal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        title={service.title}
-                  >
-                        <div className="space-y-6">
-                              <div className="relative h-64 bg-gray-200 rounded-lg overflow-hidden">
-                                    {hasImage ? (
-                                          <img
-                                                src={service.image_url ?? ''}
-                                                alt={service.title}
-                                                className="h-full w-full object-cover"
-                                                onError={() => setImageFailed(true)}
-                                          />
-                                    ) : (
-                                          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                                <svg className="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                      <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth={2}
-                                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                                                      />
-                                                </svg>
-                                          </div>
-                                    )}
-                              </div>
-
-                              <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h2>
-                                    {hasFullDescription && (
-                                          <p className="text-gray-700 leading-relaxed mb-6">{service.full_description}</p>
-                                    )}
-                              </div>
-
-                              {hasFeatures && (
-                                    <div>
-                                          <h3 className="font-bold text-gray-900 mb-4">What's Included:</h3>
-                                          <ul className="space-y-3">
-                                                {service.features.map((feature, idx) => (
-                                                      <li key={idx} className="flex items-start">
-                                                            <span className="text-primary-600 mr-3 mt-1">✓</span>
-                                                            <span className="text-gray-700">{feature}</span>
-                                                      </li>
-                                                ))}
-                                          </ul>
-                                    </div>
                               )}
 
-                              <div className="flex gap-3 pt-6 border-t">
-                                    <button
-                                          onClick={() => setIsModalOpen(false)}
-                                          className="flex-1 btn-secondary"
-                                    >
-                                          Close
-                                    </button>
-                                    <Link
-                                          href="/contact"
-                                          className="flex-1 btn-primary text-center"
-                                    >
-                                          Schedule Now
-                                    </Link>
-                              </div>
+                              <span className="mt-6 inline-flex items-center text-sm font-semibold text-teal-700 underline-offset-4 transition group-hover:text-teal-800 group-hover:underline">
+                                    View service details
+                                    <span aria-hidden="true" className="ml-1">→</span>
+                              </span>
                         </div>
-                  </Modal>
-            </>
+                  </Link>
+            </article>
       );
 }

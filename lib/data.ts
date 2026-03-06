@@ -4,12 +4,14 @@ export const therapists = [
             name: 'Erin Alexander-Bell',
             credentials: 'MA, LPC',
             title: 'Licensed Professional Counselor',
-            shortBio: 'Experienced in individual and family therapy with a compassionate, client-centered approach.',
-            fullBio: `Erin Alexander-Bell is a Licensed Professional Counselor with extensive experience in helping individuals and families navigate life's challenges. Her approach is warm, compassionate, and tailored to each client's unique needs and goals.
+            shortBio: 'Licensed Professional Counselor with over 15 years of experience supporting children, individuals, and families across Southwest Michigan.',
+            fullBio: `Erin D. Alexander-Bell, MA, LPC, is a Licensed Professional Counselor with more than 15 years of experience supporting children, individuals, and families across Southwest Michigan. She earned her master's degree in counseling from Spring Arbor University and her bachelor's degree in Community Health and Family Studies from Western Michigan University.
 
-Erin specializes in working with anxiety, depression, trauma, and relationship issues. She believes in creating a safe, non-judgmental space where clients feel heard and supported throughout their therapeutic journey.
+Throughout her career, Erin has worked in a variety of roles focused on helping families navigate difficult seasons. She has spent many years with the Michigan Department of Health and Human Services, where she worked in child welfare and later served in leadership positions. In these roles, she supported and guided teams, helped strengthen services for children in foster care, developed training programs, and worked to improve how agencies respond to concerns about child safety.
 
-With a master's degree in counseling and years of clinical experience, Erin uses evidence-based therapeutic approaches including Cognitive Behavioral Therapy (CBT) and person-centered therapy to help clients achieve meaningful change in their lives.`,
+Alongside her leadership work, Erin has provided counseling services to individuals, couples, and families through West Michigan Psychological Services. She has supported people facing challenges such as trauma, family conflict, substance use, domestic violence, anger concerns, and major life transitions.
+
+Erin believes in creating a safe, welcoming space where clients feel heard and respected. Her approach is compassionate, practical, and centered on helping people build on their strengths. With a deep understanding of both family systems and community resources, she is committed to walking alongside clients as they work toward healing, stability, and positive change.`,
             funFact: 'Loves hiking Michigan trails on weekends',
             image: '/images/therapist-placeholder.jpg',
       },
@@ -32,12 +34,12 @@ With a commitment to staying current with the latest research and best practices
             name: 'Melanie Lockett',
             credentials: 'MSW, SST',
             title: 'Social Services Technician',
-            shortBio: 'Dedicated to supporting individuals and families through comprehensive social services.',
-            fullBio: `Melanie Lockett brings a wealth of knowledge and compassion to her role as a Social Services Technician. With her Master of Social Work degree, she is committed to helping individuals and families access the resources and support they need.
+            shortBio: 'Warm, candid therapist supporting clients through anxiety, depression, trauma, grief, and life stressors.',
+            fullBio: `Life consists of many expected and unexpected challenges, losses, and traumas. These challenges can negatively affect us mentally, emotionally, and physically. I believe there are times in our lives when we may benefit from support and opportunities to learn and address root causes, establish healthy coping skills, and set future goals. I believe life's greatest challenges are best met in a safe environment where you're empowered to heal from the past and create the future you desire.
 
-Melanie's approach is holistic and strengths-based, recognizing that everyone has inherent capabilities that can be leveraged for positive change. She specializes in connecting clients with community resources, providing case management, and offering supportive counseling.
+I specialize in anxiety, depression, stress, abuse, child/parent relationships, past and present trauma, and grief and loss. I provide personalized therapy for individuals, families, teens, and the elderly. It is truly a privilege to support people as they heal and grow.
 
-Her experience spans various populations and settings, allowing her to adapt her approach to meet the diverse needs of the community. Melanie is passionate about advocacy and ensuring that all clients receive equitable, quality care.`,
+With a candid and warm therapeutic style, I work with clients to achieve sustainable success within various areas of life and circumstances. I guide client commitment to affirm innate strengths, act skillfully in the present, and practice intention for the future.`,
             funFact: 'Volunteers at local animal shelter',
             image: '/images/therapist-placeholder.jpg',
       },
@@ -45,13 +47,17 @@ Her experience spans various populations and settings, allowing her to adapt her
             id: 'beyza-niefert',
             name: 'Beyza Niefert',
             credentials: 'LLMSW',
-            title: 'Limited Licensed Master\'s Social Worker',
-            shortBio: 'Compassionate social worker focused on empowering clients through evidence-based practices.',
-            fullBio: `Beyza Niefert is a Limited Licensed Master's Social Worker who brings a fresh perspective and genuine passion to her therapeutic work. She is committed to creating a warm, collaborative environment where clients feel empowered to explore their challenges and work toward their goals.
+            title: 'Limited Licensed Clinical Social Worker',
+            shortBio: 'Client-centered, trauma-informed therapist helping children, teens, adults, and families build resilience and lasting change.',
+            fullBio: `Welcome! I'm Beyza Niefert, a Limited Licensed Clinical Social Worker dedicated to helping children, teens, adults, and families navigate life's challenges with empathy and understanding. My approach is client-centered, trauma-informed, and strengths-based, focusing on building resilience and equipping you with practical tools for meaningful, lasting change.
 
-Beyza's practice is grounded in evidence-based approaches, including cognitive-behavioral techniques and solution-focused therapy. She has experience working with diverse populations and is particularly skilled in addressing anxiety, depression, life transitions, and relationship challenges.
+I work with clients experiencing anxiety, depression, trauma, and major life transitions. In my current role within elementary schools, I use play therapy to help young children express and manage their emotions in a healthy way.
 
-With cultural sensitivity and an emphasis on the therapeutic relationship, Beyza works alongside her clients to develop practical strategies for managing stress, improving communication, and building resilience.`,
+I also have a strong passion for supporting refugees and immigrants. My experience as a case manager in a family and adult resettlement program deepened my commitment to helping individuals heal, adjust, and thrive while honoring their cultural identity.
+
+Drawing from evidence-based practices such as mindfulness, cognitive-behavioral techniques, and trauma-informed care, I tailor therapy to meet your unique needs and goals.
+
+Whether you're seeking support for yourself or a loved one, I'm here to walk with you on your path to healing and growth. Let's take the next step together.`,
             funFact: 'Speaks three languages fluently',
             image: '/images/therapist-placeholder.jpg',
       },
@@ -74,12 +80,12 @@ With advanced training in multiple therapeutic modalities, including Cognitive B
             name: 'Aaron Wilson',
             credentials: 'LMSW',
             title: 'Licensed Master\'s Social Worker',
-            shortBio: 'Experienced social worker committed to supporting clients through life\'s challenges.',
-            fullBio: `Aaron Wilson is a Licensed Master's Social Worker who brings both clinical expertise and genuine compassion to his work. He is dedicated to helping clients navigate the complexities of mental health challenges and develop the skills needed for lasting wellness.
+            shortBio: 'Therapist since 2009 with broad experience supporting adolescents, families, couples, adults, and older adults.',
+            fullBio: `I enjoy working with clients with many different issues and backgrounds. I have been a therapist since 2009. I have experience working with adolescents, families, couples, adults, and the elderly. I have experience helping clients with behavior problems, assisting parents with managing behaviors of their children, helping couples and families work out their issues, and assisting individuals with traumatic pasts, depression, anxiety, and OCD.
 
-Aaron's approach is client-centered and strengths-based, focusing on empowering individuals to recognize and build upon their existing capabilities. He has experience working with a wide range of issues, including anxiety, depression, trauma, and interpersonal difficulties.
+I seek to understand my clients' challenges and help them develop skills and strategies to overcome them.
 
-Using evidence-based practices such as Cognitive Behavioral Therapy and Dialectical Behavior Therapy, Aaron helps clients develop practical tools for managing emotions, improving relationships, and creating positive life changes. His warm, non-judgmental style helps clients feel comfortable and supported throughout their therapeutic journey.`,
+Approaches: Motivational Interviewing, Cognitive Behavioral Therapy, Brief Therapy, Solution Focused Therapy, and Relaxation Therapy.`,
             funFact: 'Avid cyclist and coffee enthusiast',
             image: '/images/therapist-placeholder.jpg',
       },

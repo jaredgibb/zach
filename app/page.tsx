@@ -4,6 +4,9 @@ import LegacyHomeFallback from '@/components/home/LegacyHomeFallback';
 import { buildJsonLdSchemas, buildSiteUrl, getPublicSnapshot, getPublishedHomePage } from '@/lib/cms/server';
 import type { CmsBlock } from '@/lib/cms/types';
 import { buildHomeLocalBusinessSchema, enhanceCmsHomePage } from '@/lib/cms/homeEnhancements';
+import { getPublicContentCollections } from '@/lib/publicContentServer';
+
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_TITLE = 'Diversified Psychological Services | Therapy in Kalamazoo, MI';
 const FALLBACK_DESCRIPTION =
@@ -101,14 +104,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-      const page = await getPublishedHomePage();
+      const [page, { therapists, services }] = await Promise.all([
+            getPublishedHomePage(),
+            getPublicContentCollections(),
+      ]);
 
       if (!page || !page.published) {
             const fallbackLocalBusinessSchema = buildHomeLocalBusinessSchema(FALLBACK_DESCRIPTION);
 
             return (
                   <>
-                        <LegacyHomeFallback />
+                        <LegacyHomeFallback therapists={therapists} services={services} />
                         <script
                               type="application/ld+json"
                               dangerouslySetInnerHTML={{
@@ -124,5 +130,13 @@ export default async function HomePage() {
       const description = snapshot.seo.metaDescription || getFallbackDescription(snapshot.blocks) || FALLBACK_DESCRIPTION;
       const schemas = [...buildJsonLdSchemas(enhancedPage), buildHomeLocalBusinessSchema(description)];
 
-      return <CmsPageRenderer page={enhancedPage} includeSchemas jsonLdSchemas={schemas} />;
+      return (
+            <CmsPageRenderer
+                  page={enhancedPage}
+                  includeSchemas
+                  jsonLdSchemas={schemas}
+                  therapists={therapists}
+                  services={services}
+            />
+      );
 }

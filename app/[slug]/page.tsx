@@ -4,6 +4,9 @@ import CmsPageRenderer from '@/components/cms/CmsPageRenderer';
 import { RESERVED_SLUGS } from '@/lib/cms/constants';
 import { buildJsonLdSchemas, buildSiteUrl, getPublishedPageBySlug, getPublicSnapshot } from '@/lib/cms/server';
 import type { CmsBlock } from '@/lib/cms/types';
+import { getPublicContentCollections } from '@/lib/publicContentServer';
+
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
       params: Promise<{
@@ -129,7 +132,10 @@ export default async function CmsSlugPage({ params }: PageProps) {
             notFound();
       }
 
-      const page = await getPublishedPageBySlug(slug);
+      const [page, { therapists, services }] = await Promise.all([
+            getPublishedPageBySlug(slug),
+            getPublicContentCollections(),
+      ]);
 
       if (!page || !page.published) {
             notFound();
@@ -137,5 +143,13 @@ export default async function CmsSlugPage({ params }: PageProps) {
 
       const schemas = buildJsonLdSchemas(page);
 
-      return <CmsPageRenderer page={page} includeSchemas jsonLdSchemas={schemas} />;
+      return (
+            <CmsPageRenderer
+                  page={page}
+                  includeSchemas
+                  jsonLdSchemas={schemas}
+                  therapists={therapists}
+                  services={services}
+            />
+      );
 }

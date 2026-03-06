@@ -1,16 +1,13 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import CmsImageCarousel from '@/components/cms/CmsImageCarousel';
 import { HomeServiceCard, type HomeServicePreview } from '@/components/home/HomeServiceCard';
 import { HomeTherapistCard, type HomeTherapistPreview } from '@/components/home/HomeTherapistCard';
-import { useServices, useTherapists } from '@/lib/hooks/useDatabase';
+import { getPrimaryTherapistSpecialty } from '@/lib/publicContent';
 import type {
       CmsBlock,
       CmsCtaBandBlock,
       CmsFaqBlock,
       CmsHeroBlock,
-      CmsImageCarouselBlock,
       CmsImageTextBlock,
       CmsInsuranceStripBlock,
       CmsLinksBlock,
@@ -30,6 +27,8 @@ interface CmsPageRendererProps {
       useDraft?: boolean;
       includeSchemas?: boolean;
       jsonLdSchemas?: Array<Record<string, unknown> | unknown[]>;
+      therapists?: Therapist[];
+      services?: Service[];
 }
 
 function isExternalHref(href: string): boolean {
@@ -39,7 +38,12 @@ function isExternalHref(href: string): boolean {
 function renderHrefLink(href: string, children: React.ReactNode, className?: string) {
       if (isExternalHref(href)) {
             return (
-                  <a href={href} className={className} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                  <a
+                        href={href}
+                        className={className}
+                        target={href.startsWith('http') ? '_blank' : undefined}
+                        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  >
                         {children}
                   </a>
             );
@@ -68,60 +72,24 @@ function parseTeamMemberBio(bio: string): { specialty: string | null; body: stri
       return { specialty, body };
 }
 
-const HOME_THERAPIST_IMAGE_FALLBACK =
-      'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=900&q=80';
-const HOME_THERAPIST_SPECIALTY_FALLBACK = 'General Mental Health Support';
-
-function looksLikeTestValue(value: string): boolean {
-      const normalized = value.trim().toLowerCase();
-      return (
-            normalized === '' ||
-            normalized === 'asdf' ||
-            normalized.includes('asdf') ||
-            normalized === 'test' ||
-            normalized === 'demo' ||
-            normalized === 'temp'
-      );
+function buildHomeTherapistPreviews(therapists: Therapist[]): HomeTherapistPreview[] {
+      return therapists.slice(0, 3).map((therapist) => ({
+            imageUrl: therapist.image_url?.trim() || '/images/stock-therapy/hero.jpg',
+            imageAlt: therapist.image_url?.trim()
+                  ? `Portrait of ${therapist.name}`
+                  : 'Comfortable therapy office in Kalamazoo with natural light',
+            name: therapist.name,
+            credentials: therapist.credentials || therapist.title || '',
+            specialty: getPrimaryTherapistSpecialty(therapist) ?? 'Therapy Support',
+            href: `/therapists/${therapist.slug}`,
+      }));
 }
 
-function isUsableTherapistForPublicDisplay(therapist: Therapist): boolean {
-      const name = therapist.name.trim();
-      return !(name.length < 5 || looksLikeTestValue(name));
-}
-
-function isUsableServiceForPublicDisplay(service: Service): boolean {
-      const title = service.title.trim();
-      return !(title.length < 4 || looksLikeTestValue(title));
-}
-
-function buildHomeTherapistPreviewsFromCms(therapists: Therapist[]): HomeTherapistPreview[] {
-      return therapists.slice(0, 3).map((therapist) => {
-            const specialty =
-                  therapist.specialties.find((item) => item.trim() && !looksLikeTestValue(item))?.trim() ??
-                  HOME_THERAPIST_SPECIALTY_FALLBACK;
-            const imageUrl = therapist.image_url?.trim() || HOME_THERAPIST_IMAGE_FALLBACK;
-            const hasPortrait = Boolean(therapist.image_url?.trim());
-
-            return {
-                  imageUrl,
-                  imageAlt: hasPortrait
-                        ? `Portrait of ${therapist.name}`
-                        : 'Comfortable therapy office in Kalamazoo with natural light',
-                  name: therapist.name,
-                  credentials: therapist.credentials || therapist.title || '',
-                  specialty,
-                  href: '/therapists',
-            };
-      });
-}
-
-function buildHomeServicePreviewsFromCms(services: Service[]): HomeServicePreview[] {
+function buildHomeServicePreviews(services: Service[]): HomeServicePreview[] {
       return services.slice(0, 6).map((service) => ({
             title: service.title,
-            description:
-                  service.short_description.trim() ||
-                  'Compassionate, evidence-informed support tailored to your goals and stage of life.',
-            href: '/services',
+            description: service.short_description,
+            href: `/services/${service.slug}`,
       }));
 }
 
@@ -396,45 +364,31 @@ function CtaBandSection({ block }: { block: CmsCtaBandBlock }) {
       );
 }
 
-function CmsLinksSection({ block, isHomePage = false }: { block: CmsLinksBlock; isHomePage?: boolean }) {
+function CmsLinksSection({
+      block,
+      isHomePage = false,
+      services = [],
+}: {
+      block: CmsLinksBlock;
+      isHomePage?: boolean;
+      services?: Service[];
+}) {
       const baseItems = block.data.items.filter((item) => item.label.trim() && item.href.trim());
       const isServicesSection =
-            block.data.title.toLowerCase().includes('service') || baseItems.some((item) => item.href.trim() === '/services') || block.id === 'dps-home-services-grid';
+            block.data.title.toLowerCase().includes('service') ||
+            baseItems.some((item) => item.href.trim() === '/services') ||
+            block.id === 'dps-home-services-grid';
       const ctaLabel = isServicesSection ? 'Learn more' : 'Open page';
-      const { fetchServices, loading: servicesLoading } = useServices();
-      const [cmsServices, setCmsServices] = useState<Service[]>([]);
+      const serviceCards = buildHomeServicePreviews(services);
 
-      useEffect(() => {
-            if (!isHomePage || !isServicesSection) {
-                  return;
-            }
-
-            let cancelled = false;
-            async function loadServices() {
-                  const data = await fetchServices();
-                  if (!cancelled) {
-                        setCmsServices(data);
-                  }
-            }
-
-            loadServices();
-
-            return () => {
-                  cancelled = true;
-            };
-      }, [fetchServices, isHomePage, isServicesSection]);
-
-      const cmsServiceCards = buildHomeServicePreviewsFromCms(cmsServices.filter(isUsableServiceForPublicDisplay));
-      const items = baseItems;
-
-      if (isHomePage && isServicesSection && cmsServiceCards.length > 0) {
+      if (isHomePage && isServicesSection && serviceCards.length > 0) {
             return (
                   <section className="py-14">
                         <div className="container-custom max-w-6xl">
                               {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
                               {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
                               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                    {cmsServiceCards.map((service) => (
+                                    {serviceCards.map((service) => (
                                           <HomeServiceCard key={`${block.id}-${service.title}`} service={service} />
                                     ))}
                               </div>
@@ -443,19 +397,30 @@ function CmsLinksSection({ block, isHomePage = false }: { block: CmsLinksBlock; 
             );
       }
 
-      if (isHomePage && isServicesSection && servicesLoading && cmsServiceCards.length === 0) {
+      if (isHomePage && isServicesSection && serviceCards.length === 0) {
             return (
                   <section className="py-14">
-                        <div className="container-custom max-w-6xl">
+                        <div className="container-custom max-w-5xl">
                               {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
-                              {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
-                              <p className="text-sm text-slate-500">Loading services...</p>
+                              {block.data.intro && <p className="mb-5 max-w-3xl text-slate-600">{block.data.intro}</p>}
+                              <p className="text-base leading-relaxed text-slate-700">
+                                    Contact our Kalamazoo office to learn which therapy services are currently available and who may be the best fit.
+                              </p>
+                              <div className="mt-5">
+                                    <Link
+                                          href="/contact"
+                                          className="inline-flex items-center text-sm font-semibold text-emerald-700 underline-offset-4 transition hover:text-emerald-800 hover:underline"
+                                    >
+                                          Contact the practice
+                                          <span aria-hidden="true" className="ml-1">→</span>
+                                    </Link>
+                              </div>
                         </div>
                   </section>
             );
       }
 
-      if (items.length === 0) {
+      if (baseItems.length === 0) {
             return null;
       }
 
@@ -466,7 +431,7 @@ function CmsLinksSection({ block, isHomePage = false }: { block: CmsLinksBlock; 
                         {block.data.intro && <p className="mb-8 text-slate-600">{block.data.intro}</p>}
 
                         <div className={block.data.layout === 'grid' ? 'grid gap-4 md:grid-cols-2' : 'space-y-3'}>
-                              {items.map((item, index) => (
+                              {baseItems.map((item, index) => (
                                     <div
                                           key={`${block.id}-${index}`}
                                           className={`rounded-2xl border bg-white p-5 shadow-sm ${
@@ -485,100 +450,6 @@ function CmsLinksSection({ block, isHomePage = false }: { block: CmsLinksBlock; 
                                     </div>
                               ))}
                         </div>
-                  </div>
-            </section>
-      );
-}
-
-function ImageCarouselSection({ block }: { block: CmsImageCarouselBlock }) {
-      const items = useMemo(
-            () => block.data.items.filter((item) => item.imageUrl.trim().length > 0),
-            [block.data.items]
-      );
-      const [activeIndex, setActiveIndex] = useState(0);
-
-      useEffect(() => {
-            if (!block.data.autoplay || items.length < 2) {
-                  return;
-            }
-
-            const intervalMs = Number.isFinite(block.data.intervalMs) ? block.data.intervalMs : 5000;
-            const timer = window.setInterval(() => {
-                  setActiveIndex((current) => (current + 1) % items.length);
-            }, Math.max(intervalMs, 1000));
-
-            return () => window.clearInterval(timer);
-      }, [block.data.autoplay, block.data.intervalMs, items.length]);
-
-      if (items.length === 0) {
-            return null;
-      }
-
-      const safeActiveIndex = activeIndex % items.length;
-      const activeItem = items[safeActiveIndex] ?? items[0];
-      if (!activeItem) {
-            return null;
-      }
-
-      const goNext = () => setActiveIndex((current) => (current + 1) % items.length);
-      const goPrev = () => setActiveIndex((current) => (current - 1 + items.length) % items.length);
-
-      return (
-            <section className="surface-warm py-14">
-                  <div className="container-custom max-w-5xl">
-                        {block.data.title && <h2 className="mb-6 text-3xl text-slate-900">{block.data.title}</h2>}
-
-                        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
-                              {activeItem.href
-                                    ? renderHrefLink(
-                                            activeItem.href,
-                                            <img
-                                                  src={activeItem.imageUrl}
-                                                  alt={activeItem.imageAlt || activeItem.caption || block.data.title || 'Carousel image'}
-                                                  className="h-[320px] w-full object-cover md:h-[420px]"
-                                            />,
-                                            'block'
-                                      )
-                                    : (
-                                          <img
-                                                src={activeItem.imageUrl}
-                                                alt={activeItem.imageAlt || activeItem.caption || block.data.title || 'Carousel image'}
-                                                className="h-[320px] w-full object-cover md:h-[420px]"
-                                          />
-                                    )}
-
-                              {items.length > 1 && (
-                                    <>
-                                          <button
-                                                type="button"
-                                                onClick={goPrev}
-                                                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/60 px-3 py-2 text-white hover:bg-black/75"
-                                                aria-label="Previous slide"
-                                          >
-                                                ‹
-                                          </button>
-                                          <button
-                                                type="button"
-                                                onClick={goNext}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/60 px-3 py-2 text-white hover:bg-black/75"
-                                                aria-label="Next slide"
-                                          >
-                                                ›
-                                          </button>
-                                    </>
-                              )}
-                        </div>
-
-                        {(activeItem.caption || items.length > 1) && (
-                              <div className="mt-3 flex items-center justify-between gap-4">
-                                    <p className="text-sm text-slate-700">{activeItem.caption}</p>
-                                    {items.length > 1 && (
-                                          <p className="text-xs text-slate-500">
-                                                {safeActiveIndex + 1} / {items.length}
-                                          </p>
-                                    )}
-                              </div>
-                        )}
                   </div>
             </section>
       );
@@ -676,28 +547,23 @@ function PricingCardsSection({ block }: { block: CmsPricingCardsBlock }) {
       );
 }
 
-function getAspectClass(aspectRatio: CmsVideoEmbedBlock['data']['aspectRatio']): string {
-      switch (aspectRatio) {
-            case '4:3':
-                  return 'pt-[75%]';
-            case '1:1':
-                  return 'pt-[100%]';
-            case '16:9':
-            default:
-                  return 'pt-[56.25%]';
-      }
-}
-
 function VideoEmbedSection({ block }: { block: CmsVideoEmbedBlock }) {
       if (!block.data.embedUrl.trim()) {
             return null;
       }
 
+      const aspectClass =
+            block.data.aspectRatio === '4:3'
+                  ? 'pt-[75%]'
+                  : block.data.aspectRatio === '1:1'
+                        ? 'pt-[100%]'
+                        : 'pt-[56.25%]';
+
       return (
             <section className="py-14">
                   <div className="container-custom max-w-5xl">
                         {block.data.title && <h2 className="mb-6 text-3xl text-slate-900">{block.data.title}</h2>}
-                        <div className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-black ${getAspectClass(block.data.aspectRatio)}`}>
+                        <div className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-black ${aspectClass}`}>
                               <iframe
                                     src={block.data.embedUrl}
                                     title={block.data.title || 'Embedded video'}
@@ -713,41 +579,26 @@ function VideoEmbedSection({ block }: { block: CmsVideoEmbedBlock }) {
       );
 }
 
-function TeamGridSection({ block, isHomePage = false }: { block: CmsTeamGridBlock; isHomePage?: boolean }) {
+function TeamGridSection({
+      block,
+      isHomePage = false,
+      therapists = [],
+}: {
+      block: CmsTeamGridBlock;
+      isHomePage?: boolean;
+      therapists?: Therapist[];
+}) {
       const members = block.data.members.filter((member) => member.name.trim());
-      const { fetchTherapists, loading: therapistsLoading } = useTherapists();
-      const [cmsTherapists, setCmsTherapists] = useState<Therapist[]>([]);
+      const therapistCards = buildHomeTherapistPreviews(therapists);
 
-      useEffect(() => {
-            if (!isHomePage) {
-                  return;
-            }
-
-            let cancelled = false;
-            async function loadTherapists() {
-                  const data = await fetchTherapists();
-                  if (!cancelled) {
-                        setCmsTherapists(data);
-                  }
-            }
-
-            loadTherapists();
-
-            return () => {
-                  cancelled = true;
-            };
-      }, [fetchTherapists, isHomePage]);
-
-      const cmsTherapistCards = buildHomeTherapistPreviewsFromCms(cmsTherapists.filter(isUsableTherapistForPublicDisplay));
-
-      if (isHomePage && cmsTherapistCards.length > 0) {
+      if (isHomePage && therapistCards.length > 0) {
             return (
                   <section className="py-16">
                         <div className="container-custom max-w-6xl">
                               {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
                               {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
                               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                                    {cmsTherapistCards.map((therapist) => (
+                                    {therapistCards.map((therapist) => (
                                           <HomeTherapistCard key={`${block.id}-${therapist.name}`} therapist={therapist} />
                                     ))}
                               </div>
@@ -756,13 +607,24 @@ function TeamGridSection({ block, isHomePage = false }: { block: CmsTeamGridBloc
             );
       }
 
-      if (isHomePage && therapistsLoading && cmsTherapistCards.length === 0) {
+      if (isHomePage && therapistCards.length === 0) {
             return (
                   <section className="py-16">
-                        <div className="container-custom max-w-6xl">
+                        <div className="container-custom max-w-5xl">
                               {block.data.title && <h2 className="mb-4 text-3xl text-slate-900 md:text-4xl">{block.data.title}</h2>}
-                              {block.data.intro && <p className="mb-8 max-w-3xl text-slate-600">{block.data.intro}</p>}
-                              <p className="text-sm text-slate-500">Loading therapists...</p>
+                              {block.data.intro && <p className="mb-5 max-w-3xl text-slate-600">{block.data.intro}</p>}
+                              <p className="text-base leading-relaxed text-slate-700">
+                                    Call or email our Kalamazoo office to ask about current therapist availability and the best match for your needs.
+                              </p>
+                              <div className="mt-5">
+                                    <Link
+                                          href="/contact"
+                                          className="inline-flex items-center text-sm font-semibold text-emerald-700 underline-offset-4 transition hover:text-emerald-800 hover:underline"
+                                    >
+                                          Contact the practice
+                                          <span aria-hidden="true" className="ml-1">→</span>
+                                    </Link>
+                              </div>
                         </div>
                   </section>
             );
@@ -786,27 +648,27 @@ function TeamGridSection({ block, isHomePage = false }: { block: CmsTeamGridBloc
 
                                     return (
                                           <article key={`${block.id}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                                          {member.imageUrl && (
-                                                <img
-                                                      src={member.imageUrl}
-                                                      alt={member.imageAlt || member.name}
-                                                      className="mb-4 h-52 w-full rounded-xl object-cover"
-                                                />
-                                          )}
-                                          {parsedBio.specialty ? (
+                                                {member.imageUrl && (
+                                                      <img
+                                                            src={member.imageUrl}
+                                                            alt={member.imageAlt || member.name}
+                                                            className="mb-4 h-52 w-full rounded-xl object-cover"
+                                                      />
+                                                )}
+                                                {parsedBio.specialty ? (
                                                       <p className="mb-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
                                                             {parsedBio.specialty}
                                                       </p>
-                                          ) : null}
-                                          <h3 className="text-lg font-semibold text-slate-900">{member.name}</h3>
-                                          {member.role && <p className="mt-1 text-sm text-emerald-700">{member.role}</p>}
-                                          {parsedBio.body ? <p className="mt-3 text-sm text-slate-600">{parsedBio.body}</p> : null}
-                                          {member.profileHref &&
-                                                renderHrefLink(
-                                                      member.profileHref,
-                                                      'View Profile',
-                                                      'mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2'
-                                                )}
+                                                ) : null}
+                                                <h3 className="text-lg font-semibold text-slate-900">{member.name}</h3>
+                                                {member.role && <p className="mt-1 text-sm text-emerald-700">{member.role}</p>}
+                                                {parsedBio.body ? <p className="mt-3 text-sm text-slate-600">{parsedBio.body}</p> : null}
+                                                {member.profileHref &&
+                                                      renderHrefLink(
+                                                            member.profileHref,
+                                                            'View Profile',
+                                                            'mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2'
+                                                      )}
                                           </article>
                                     );
                               })}
@@ -816,7 +678,14 @@ function TeamGridSection({ block, isHomePage = false }: { block: CmsTeamGridBloc
       );
 }
 
-function renderBlock(block: CmsBlock, context: { isHomePage: boolean }) {
+function renderBlock(
+      block: CmsBlock,
+      context: {
+            isHomePage: boolean;
+            therapists: Therapist[];
+            services: Service[];
+      }
+) {
       if (!block.visible) {
             return null;
       }
@@ -839,9 +708,16 @@ function renderBlock(block: CmsBlock, context: { isHomePage: boolean }) {
             case 'cta_band':
                   return <CtaBandSection block={block} />;
             case 'cms_links':
-                  return <CmsLinksSection block={block} isHomePage={context.isHomePage} />;
+                  return <CmsLinksSection block={block} isHomePage={context.isHomePage} services={context.services} />;
             case 'image_carousel':
-                  return <ImageCarouselSection block={block} />;
+                  return (
+                        <CmsImageCarousel
+                              title={block.data.title}
+                              items={block.data.items}
+                              autoplay={block.data.autoplay}
+                              intervalMs={block.data.intervalMs}
+                        />
+                  );
             case 'testimonials':
                   return <TestimonialsSection block={block} />;
             case 'pricing_cards':
@@ -849,7 +725,7 @@ function renderBlock(block: CmsBlock, context: { isHomePage: boolean }) {
             case 'video_embed':
                   return <VideoEmbedSection block={block} />;
             case 'team_grid':
-                  return <TeamGridSection block={block} isHomePage={context.isHomePage} />;
+                  return <TeamGridSection block={block} isHomePage={context.isHomePage} therapists={context.therapists} />;
             default:
                   return null;
       }
@@ -860,6 +736,8 @@ export default function CmsPageRenderer({
       useDraft = false,
       includeSchemas = false,
       jsonLdSchemas = [],
+      therapists = [],
+      services = [],
 }: CmsPageRendererProps) {
       const snapshot = useDraft || !page.published ? page.draft : page.published;
       const isHomePage = page.path === '/' || page.slug === 'home';
@@ -867,7 +745,7 @@ export default function CmsPageRenderer({
       return (
             <>
                   {snapshot.blocks.map((block) => (
-                        <div key={block.id}>{renderBlock(block, { isHomePage })}</div>
+                        <div key={block.id}>{renderBlock(block, { isHomePage, therapists, services })}</div>
                   ))}
 
                   {includeSchemas &&
