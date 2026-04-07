@@ -41,16 +41,18 @@ export default function Header({ cmsItems = [] }: HeaderProps) {
                         <div className="flex justify-between items-center">
                               {/* Logo */}
                               <Link href="/" className="flex items-center">
-                                    <div className="flex items-center gap-3">
-                                          <div className="rounded-lg border border-primary-100 bg-white p-1 shadow-sm">
-                                                <Image
-                                                      src="/branding/dps-logo-mark.png"
-                                                      alt="Diversified Psychological Services logo mark"
-                                                      width={34}
-                                                      height={58}
-                                                      className="h-12 w-auto"
-                                                      priority
-                                                />
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                          <div className="shrink-0 rounded-lg border border-primary-100 bg-white px-1.5 py-1 shadow-sm md:px-2 md:py-1.5">
+                                                <div className="relative h-9 w-14 md:h-12 md:w-20">
+                                                      <Image
+                                                            src="/branding/dps-logo-mark.png"
+                                                            alt="Diversified Psychological Services logo mark"
+                                                            fill
+                                                            sizes="(min-width: 768px) 80px, 56px"
+                                                            className="-rotate-90 scale-[1.5] object-contain md:scale-[1.55]"
+                                                            priority
+                                                      />
+                                                </div>
                                           </div>
                                           <div className="text-2xl font-bold leading-tight text-primary-600">
                                                 <span className="block">Diversified</span>

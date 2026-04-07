@@ -155,7 +155,10 @@ export default async function TherapistDetailPage({ params }: PageProps) {
 
                                           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                                                 <Link
-                                                      href="/contact"
+                                                      href={{
+                                                            pathname: '/contact',
+                                                            query: { therapist: therapist.slug },
+                                                      }}
                                                       className="inline-flex items-center justify-center rounded-lg bg-teal-700 px-6 py-3 font-semibold text-white transition hover:bg-teal-800"
                                                 >
                                                       Contact the practice

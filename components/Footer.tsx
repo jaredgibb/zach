@@ -24,14 +24,16 @@ export default function Footer({ cmsItems = [] }: FooterProps) {
                               {/* Left Column - About */}
                               <div>
                                     <div className="mb-4 flex items-center gap-3">
-                                          <div className="rounded-lg bg-white/95 p-1.5 shadow-sm ring-1 ring-white/10">
-                                                <Image
-                                                      src="/branding/dps-logo-mark.png"
-                                                      alt="Diversified Psychological Services logo mark"
-                                                      width={28}
-                                                      height={48}
-                                                      className="h-10 w-auto"
-                                                />
+                                          <div className="shrink-0 rounded-lg bg-white/95 px-1.5 py-1 shadow-sm ring-1 ring-white/10 md:px-2 md:py-1.5">
+                                                <div className="relative h-8 w-12 md:h-10 md:w-16">
+                                                      <Image
+                                                            src="/branding/dps-logo-mark.png"
+                                                            alt="Diversified Psychological Services logo mark"
+                                                            fill
+                                                            sizes="(min-width: 768px) 64px, 48px"
+                                                            className="-rotate-90 scale-[1.5] object-contain md:scale-[1.55]"
+                                                      />
+                                                </div>
                                           </div>
                                           <div className="text-xl font-bold leading-tight text-white">
                                                 Diversified<br />Psychological Services

@@ -159,7 +159,7 @@ The app can be deployed to any platform supporting Node.js:
 ## Next Steps
 
 - [ ] Add real therapist photos and headshots
-- [ ] Connect contact forms to email service (zachd@diversifiedpsychservices.com)
+- [ ] Add `MAILGUN_API_KEY` for contact form delivery
 - [ ] Add stock therapy session images
 - [ ] Complete legal page content
 - [ ] Add insurance provider logos (see: https://freedomcounselingkalamazoo.us/about/)

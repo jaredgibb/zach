@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import ContactForm from '@/components/ContactForm';
 import StructuredData from '@/components/StructuredData';
 import { buildSiteUrl } from '@/lib/cms/server';
 import { businessInfo, insuranceProviders } from '@/lib/data';
 import {
       buildBreadcrumbSchema,
       buildPracticeLocalBusinessSchema,
+      getPublicTherapists,
 } from '@/lib/publicContentServer';
 
 const PAGE_TITLE = 'Contact Diversified Psychological Services | Kalamazoo, MI';
@@ -31,7 +33,19 @@ export const metadata: Metadata = {
       },
 };
 
-export default function ContactPage() {
+interface ContactPageProps {
+      searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+      const resolvedSearchParams = await searchParams;
+      const therapistQuery = Array.isArray(resolvedSearchParams.therapist)
+            ? resolvedSearchParams.therapist[0]
+            : resolvedSearchParams.therapist;
+      const therapistOptions = (await getPublicTherapists()).map((therapist) => ({
+            slug: therapist.slug,
+            name: therapist.name,
+      }));
       const schemas = [
             buildPracticeLocalBusinessSchema(PAGE_DESCRIPTION),
             buildBreadcrumbSchema([
@@ -60,52 +74,60 @@ export default function ContactPage() {
 
                   <div className="bg-white py-16">
                         <div className="container-custom max-w-6xl">
-                              <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-                                    <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
-                                          <h2 className="text-2xl text-slate-900">Contact details</h2>
-                                          <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700">
-                                                <p>
-                                                      <strong className="text-slate-900">Phone:</strong>{' '}
-                                                      <a href={`tel:${businessInfo.phone}`} className="font-semibold text-teal-800 underline underline-offset-4">
-                                                            {businessInfo.phone}
-                                                      </a>
-                                                </p>
-                                                <p>
-                                                      <strong className="text-slate-900">Email:</strong>{' '}
-                                                      <a href={`mailto:${businessInfo.email}`} className="font-semibold text-teal-800 underline underline-offset-4">
-                                                            {businessInfo.email}
-                                                      </a>
-                                                </p>
-                                                <p>
-                                                      <strong className="text-slate-900">Office:</strong><br />
-                                                      {businessInfo.address}<br />
-                                                      {businessInfo.city}, {businessInfo.state} {businessInfo.zip}
-                                                </p>
-                                          </div>
+                              <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+                                    <div className="space-y-8">
+                                          <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
+                                                <h2 className="text-2xl text-slate-900">Contact details</h2>
+                                                <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700">
+                                                      <p>
+                                                            <strong className="text-slate-900">Phone:</strong>{' '}
+                                                            <a href={`tel:${businessInfo.phone}`} className="font-semibold text-teal-800 underline underline-offset-4">
+                                                                  {businessInfo.phone}
+                                                            </a>
+                                                      </p>
+                                                      <p>
+                                                            <strong className="text-slate-900">Email:</strong>{' '}
+                                                            <a href={`mailto:${businessInfo.email}`} className="font-semibold text-teal-800 underline underline-offset-4">
+                                                                  {businessInfo.email}
+                                                            </a>
+                                                      </p>
+                                                      <p>
+                                                            <strong className="text-slate-900">Office:</strong><br />
+                                                            {businessInfo.address}<br />
+                                                            {businessInfo.city}, {businessInfo.state} {businessInfo.zip}
+                                                      </p>
+                                                </div>
 
-                                          <div className="mt-8 rounded-2xl bg-teal-50 p-5">
-                                                <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">
-                                                      Helpful to include when you reach out
-                                                </h3>
-                                                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
-                                                      <li>Your preferred days or times for appointments</li>
-                                                      <li>Your insurance plan or payer</li>
-                                                      <li>Whether you prefer in-person or telehealth care</li>
-                                                      <li>Any therapist preference or main reason you are seeking support</li>
+                                                <div className="mt-8 rounded-2xl bg-teal-50 p-5">
+                                                      <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-800">
+                                                            Helpful to include when you reach out
+                                                      </h3>
+                                                      <ul className="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
+                                                            <li>Your preferred days or times for appointments</li>
+                                                            <li>Your insurance plan or payer</li>
+                                                            <li>Whether you prefer in-person or telehealth care</li>
+                                                            <li>Any therapist preference or main reason you are seeking support</li>
+                                                      </ul>
+                                                </div>
+                                          </section>
+
+                                          <section className="rounded-3xl border border-red-200 bg-red-50 p-8 shadow-sm">
+                                                <h2 className="text-2xl text-red-950">Emergency notice</h2>
+                                                <p className="mt-4 text-base leading-relaxed text-red-900">
+                                                      This practice is not an emergency service. If you are experiencing a mental health crisis, do not wait for a callback from the office.
+                                                </p>
+                                                <ul className="mt-5 space-y-3 text-sm leading-relaxed text-red-900">
+                                                      <li>Dial or text <strong>988</strong> for the Suicide and Crisis Lifeline.</li>
+                                                      <li>Call <strong>911</strong> or go to the nearest emergency room if you are in immediate danger.</li>
                                                 </ul>
-                                          </div>
-                                    </section>
+                                          </section>
+                                    </div>
 
-                                    <section className="rounded-3xl border border-red-200 bg-red-50 p-8 shadow-sm">
-                                          <h2 className="text-2xl text-red-950">Emergency notice</h2>
-                                          <p className="mt-4 text-base leading-relaxed text-red-900">
-                                                This practice is not an emergency service. If you are experiencing a mental health crisis, do not wait for a callback from the office.
-                                          </p>
-                                          <ul className="mt-5 space-y-3 text-sm leading-relaxed text-red-900">
-                                                <li>Dial or text <strong>988</strong> for the Suicide and Crisis Lifeline.</li>
-                                                <li>Call <strong>911</strong> or go to the nearest emergency room if you are in immediate danger.</li>
-                                          </ul>
-                                    </section>
+                                    <ContactForm
+                                          initialTherapistQuery={therapistQuery}
+                                          insuranceOptions={insuranceProviders}
+                                          therapistOptions={therapistOptions}
+                                    />
                               </div>
                         </div>
                   </div>
