@@ -1,16 +1,8 @@
 import type { MetadataRoute } from 'next';
-
-function getBaseUrl(): string {
-      const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-      if (configured && /^https?:\/\//.test(configured)) {
-            return configured;
-      }
-
-      return 'http://localhost:3000';
-}
+import { getSiteUrl } from '@/lib/site-url';
 
 export default function robots(): MetadataRoute.Robots {
-      const baseUrl = getBaseUrl();
+      const baseUrl = getSiteUrl();
 
       return {
             rules: {

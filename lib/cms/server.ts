@@ -2,6 +2,7 @@ import 'server-only';
 
 import { CMS_COLLECTION, SYSTEM_PAGE_DEFINITIONS } from '@/lib/cms/constants';
 import { createDefaultSnapshot } from '@/lib/cms/defaults';
+import { getSiteUrl } from '@/lib/site-url';
 import type {
       CmsFaqBlock,
       CmsFooterNavItem,
@@ -240,11 +241,7 @@ export function getPublicSnapshot(page: CmsPage): CmsPageSnapshot {
 }
 
 export function buildSiteUrl(pathname: string): string {
-      const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-      const baseUrl = configured && /^https?:\/\//.test(configured)
-            ? configured
-            : 'http://localhost:3000';
-
+      const baseUrl = getSiteUrl();
       const normalizedPath = pathname.startsWith('/') ? pathname : `/${pathname}`;
       return new URL(normalizedPath, baseUrl).toString();
 }

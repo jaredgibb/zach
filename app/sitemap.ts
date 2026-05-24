@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getSitemapPages } from '@/lib/cms/server';
+import { getSiteUrl } from '@/lib/site-url';
 
 const STATIC_PATHS = [
       '/',
@@ -13,17 +14,8 @@ const STATIC_PATHS = [
       '/nondiscrimination',
 ] as const;
 
-function getBaseUrl(): string {
-      const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-      if (configured && /^https?:\/\//.test(configured)) {
-            return configured;
-      }
-
-      return 'http://localhost:3000';
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-      const baseUrl = getBaseUrl();
+      const baseUrl = getSiteUrl();
       const dynamicPages = await getSitemapPages();
       const paths = new Map<string, Date>();
 

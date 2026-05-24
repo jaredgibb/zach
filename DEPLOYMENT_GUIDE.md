@@ -47,6 +47,7 @@ git push -u origin main
      ```
      NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
      NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+     NEXT_PUBLIC_SITE_URL=https://yourdomain.com
      ```
    - Click "Add"
 
@@ -94,6 +95,7 @@ Every push to `main` branch automatically deploys to production.
      ```
      NEXT_PUBLIC_SUPABASE_URL
      NEXT_PUBLIC_SUPABASE_ANON_KEY
+     NEXT_PUBLIC_SITE_URL
      ```
 
 5. **Save and Deploy**
@@ -174,9 +176,10 @@ docker run -p 3000:80 \
 3. **Environment Variables**
    - Add Supabase variables in "Environment" tab:
      ```
-     NEXT_PUBLIC_SUPABASE_URL
-     NEXT_PUBLIC_SUPABASE_ANON_KEY
-     ```
+      NEXT_PUBLIC_SUPABASE_URL
+      NEXT_PUBLIC_SUPABASE_ANON_KEY
+      NEXT_PUBLIC_SITE_URL
+      ```
 
 4. **Deploy**
    - Click "Deploy"
@@ -225,9 +228,12 @@ Create `.env.local` file with:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 ```
 
 **Security Note**: Never commit `.env.local` to git. Use platform-specific environment variable management instead.
+
+When you use both apex and `www`, add both hostnames in your hosting provider and redirect `www` to the primary domain.
 
 ---
 

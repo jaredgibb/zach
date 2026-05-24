@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ClientPortalBanner from "@/components/ClientPortalBanner";
 import { getPublishedNavItems } from "@/lib/cms/server";
+import { getSiteUrlObject } from "@/lib/site-url";
 
 const sourceSans = Source_Sans_3({
       subsets: ["latin"],
@@ -17,23 +18,8 @@ const lora = Lora({
       variable: "--font-display",
       weight: ["500", "600", "700"],
 });
-const fallbackMetadataBase = "http://localhost:3000";
-
-function getMetadataBase(): URL {
-      const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-      if (configured) {
-            try {
-                  return new URL(configured);
-            } catch {
-                  return new URL(fallbackMetadataBase);
-            }
-      }
-
-      return new URL(fallbackMetadataBase);
-}
-
 export const metadata: Metadata = {
-      metadataBase: getMetadataBase(),
+      metadataBase: getSiteUrlObject(),
       title: "Diversified Psychological Services | Therapy in Kalamazoo, MI",
       description: "Professional therapy services in Kalamazoo, MI. Individual therapy, couples counseling, and family therapy. Accepting most major insurance providers.",
 };

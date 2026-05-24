@@ -1,4 +1,10 @@
 env:
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://diversifiedpsychservices.com
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: AIzaSyDC2p0Q0W7oAtKnRaQi7C-MpsLPilrMCC4
     availability:

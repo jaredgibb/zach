@@ -6,7 +6,7 @@ import type { CmsBlock } from '@/lib/cms/types';
 import { buildHomeLocalBusinessSchema, enhanceCmsHomePage } from '@/lib/cms/homeEnhancements';
 import { getPublicContentCollections } from '@/lib/publicContentServer';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 const FALLBACK_TITLE = 'Diversified Psychological Services | Therapy in Kalamazoo, MI';
 const FALLBACK_DESCRIPTION =
