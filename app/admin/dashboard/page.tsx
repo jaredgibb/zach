@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
-      const { user, isAdmin, loading, error } = useAdmin();
+      const { user, isAdmin, isSuperAdmin, loading, error } = useAdmin();
       const router = useRouter();
 
       useEffect(() => {
@@ -129,6 +129,26 @@ export default function AdminDashboard() {
                                           </Link>
                                     </div>
                               </div>
+
+                              {isSuperAdmin && (
+                                    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow md:col-span-2">
+                                          <div className="bg-primary-600 text-white p-6">
+                                                <h2 className="text-2xl font-bold mb-2">Admin Users</h2>
+                                                <p className="text-primary-100">Add or remove admin access</p>
+                                          </div>
+                                          <div className="p-6">
+                                                <p className="text-gray-600 mb-6">
+                                                      Manage who can edit site content and keep superadmin access locked.
+                                                </p>
+                                                <Link
+                                                      href="/admin/admins"
+                                                      className="inline-block btn-primary"
+                                                >
+                                                      Manage Admins
+                                                </Link>
+                                          </div>
+                                    </div>
+                              )}
                         </div>
 
                         {/* Quick Stats */}

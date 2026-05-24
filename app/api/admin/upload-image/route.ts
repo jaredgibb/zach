@@ -1,25 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb, adminStorage } from '@/lib/firebase/admin';
+import { requireAdminUser } from '@/lib/cms/admin-auth';
+import { getAuthErrorStatus } from '@/lib/cms/api-errors';
+import { adminStorage } from '@/lib/firebase/admin';
 
 export const runtime = 'nodejs';
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const VALID_FOLDERS = new Set(['services', 'therapists']);
-
-function getBearerToken(request: NextRequest): string | null {
-      const authorization = request.headers.get('authorization');
-      if (!authorization) {
-            return null;
-      }
-
-      const [scheme, token] = authorization.split(' ');
-      if (scheme?.toLowerCase() !== 'bearer' || !token) {
-            return null;
-      }
-
-      return token;
-}
 
 function sanitizePathSegment(value: string): string {
       const normalized = value
@@ -44,28 +32,9 @@ function sanitizeFileName(fileName: string): string {
       return normalized || 'image';
 }
 
-async function isAdminUser(uid: string): Promise<boolean> {
-      const adminSnapshot = await adminDb.collection('admins').doc(uid).get();
-      if (!adminSnapshot.exists) {
-            return false;
-      }
-
-      const data = adminSnapshot.data() as { role?: string; active?: boolean } | undefined;
-      return data?.role === 'admin' && data?.active !== false;
-}
-
 export async function POST(request: NextRequest) {
       try {
-            const token = getBearerToken(request);
-            if (!token) {
-                  return NextResponse.json({ error: 'Missing authorization token.' }, { status: 401 });
-            }
-
-            const decodedToken = await adminAuth.verifyIdToken(token);
-            const hasAdminAccess = await isAdminUser(decodedToken.uid);
-            if (!hasAdminAccess) {
-                  return NextResponse.json({ error: 'You do not have admin access.' }, { status: 403 });
-            }
+            await requireAdminUser(request);
 
             const formData = await request.formData();
             const file = formData.get('file');
@@ -115,6 +84,7 @@ export async function POST(request: NextRequest) {
             });
       } catch (error) {
             const message = error instanceof Error ? error.message : 'Image upload failed.';
-            return NextResponse.json({ error: message }, { status: 500 });
+            const authStatus = getAuthErrorStatus(message);
+            return NextResponse.json({ error: message }, { status: authStatus });
       }
 }

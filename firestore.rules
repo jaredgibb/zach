@@ -5,14 +5,27 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isSuperAdmin() {
+      return isSignedIn()
+        && request.auth.token.email in [
+          "zach@diversifiedpsychservices.com",
+          "jared.gibb@gmail.com"
+        ];
+    }
+
     function isAdmin() {
       return isSignedIn()
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "admin"
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active != false;
+        && (
+          isSuperAdmin()
+          || (
+            get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "admin"
+            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active != false
+          )
+        );
     }
 
     match /admins/{uid} {
-      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
       allow write: if false;
     }
 
